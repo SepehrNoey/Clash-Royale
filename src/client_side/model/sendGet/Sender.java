@@ -1,6 +1,6 @@
 package client_side.model.sendGet;
 
-import shared.Message;
+import shared.model.Message;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

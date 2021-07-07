@@ -1,9 +1,8 @@
 package server_side.starter;
 
-import shared.Message;
+import shared.model.Message;
 import shared.MessageType;
 
-import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 

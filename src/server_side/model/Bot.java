@@ -1,7 +1,7 @@
 package server_side.model;
 
-import shared.Card;
-import shared.Message;
+import shared.model.card.Card;
+import shared.model.Message;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;

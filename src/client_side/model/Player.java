@@ -2,8 +2,8 @@ package client_side.model;
 
 import client_side.model.sendGet.Getter;
 import client_side.model.sendGet.Sender;
-import shared.Card;
-import shared.Message;
+import shared.model.card.Card;
+import shared.model.Message;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

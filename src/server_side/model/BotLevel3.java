@@ -1,6 +1,6 @@
 package server_side.model;
 
-import shared.Message;
+import shared.model.Message;
 
 import java.util.concurrent.ArrayBlockingQueue;
 

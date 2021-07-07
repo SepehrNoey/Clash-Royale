@@ -5,7 +5,7 @@ import server_side.model.Bot;
 import server_side.model.BotLevel1;
 import server_side.model.BotLevel2;
 import server_side.model.BotLevel3;
-import shared.Message;
+import shared.model.Message;
 import shared.MessageType;
 
 import java.io.*;
