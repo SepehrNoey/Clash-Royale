@@ -12,6 +12,7 @@ public class Getter implements Runnable { // must be thread
 
     public Getter(ObjectInputStream inObj, ArrayBlockingQueue<Message> sharedInbox){
         this.inObj = inObj;
+        this.sharedInbox = sharedInbox;
     }
 
     public Message getMsg(){
@@ -25,9 +26,14 @@ public class Getter implements Runnable { // must be thread
     }
 
     public void run(){
-        while (true)
+        while (true) // handle later !!!
         {
-
+            Message msg = getMsg();
+            try {
+                sharedInbox.put(msg);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
         }
     }
 }
