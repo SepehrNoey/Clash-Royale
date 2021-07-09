@@ -1,4 +1,4 @@
-package scenes;
+package client_side.view.scenes;
 
 
 import javafx.scene.Cursor;
@@ -15,20 +15,21 @@ public class SignUpScene extends EnteranceScene{
     public Group buildScene()
     {
         Group signUpPage = new Group();
-        ImageView title = new ImageView(new Image("./pics/signUpPage.png"));
-        signUpBlack = new Image("./pics/signUpBlack.png");
-        signUpWhite = new Image("./pics/signUpWhite.png");
+        ImageView title = new ImageView(new Image("client_side/view/pics/signUpPage.png"));
+        signUpBlack = new Image("client_side/view/pics/signUpBlack.png");
+        signUpWhite = new Image("client_side/view/pics/signUpWhite.png");
         op = new ImageView(signUpBlack);
 
-        op.setFitWidth(75);
-        op.setFitHeight(35);
-        op.setTranslateX(250);
+        op.setFitWidth(85);
+        op.setFitHeight(40);
+        op.setTranslateX(280);
         op.setTranslateY(400);
 
-        title.setTranslateX(100);
+        title.setTranslateX(172);
         title.setTranslateY(100);
         title.setFitWidth(300);
         title.setFitHeight(80);
+
 
         signUpPage.getChildren().add(back);
         signUpPage.getChildren().add(title);

@@ -1,6 +1,6 @@
 package shared.model;
 
-import shared.MessageType;
+import shared.enums.MessageType;
 
 import java.io.Serializable;
 

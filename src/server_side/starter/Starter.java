@@ -1,12 +1,12 @@
 package server_side.starter;
-import client_side.model.Player;
+import shared.model.Player;
 import server_side.manager.GameLoop;
 import server_side.model.Bot;
 import server_side.model.BotLevel1;
 import server_side.model.BotLevel2;
 import server_side.model.BotLevel3;
 import shared.model.Message;
-import shared.MessageType;
+import shared.enums.MessageType;
 
 import java.io.*;
 import java.net.ServerSocket;

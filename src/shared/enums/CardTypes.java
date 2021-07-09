@@ -1,4 +1,4 @@
-package shared;
+package shared.enums;
 
 public enum CardTypes {
     BARBARIAN,

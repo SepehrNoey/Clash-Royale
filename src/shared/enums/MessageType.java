@@ -1,4 +1,4 @@
-package shared;
+package shared.enums;
 
 import java.io.Serializable;
 

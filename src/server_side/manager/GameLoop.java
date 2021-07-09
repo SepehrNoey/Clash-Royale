@@ -1,6 +1,6 @@
 package server_side.manager;
 
-import client_side.model.Player;
+import shared.model.Player;
 import server_side.model.Bot;
 import shared.model.Message;
 

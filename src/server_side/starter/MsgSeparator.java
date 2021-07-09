@@ -1,7 +1,7 @@
 package server_side.starter;
 
 import shared.model.Message;
-import shared.MessageType;
+import shared.enums.MessageType;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;

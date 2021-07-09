@@ -1,4 +1,4 @@
-package client_side.model;
+package shared.model;
 
 import client_side.model.sendGet.Getter;
 import client_side.model.sendGet.Sender;
