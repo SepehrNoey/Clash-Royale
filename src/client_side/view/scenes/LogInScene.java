@@ -6,6 +6,8 @@ import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.net.Socket;
+
 public class LogInScene extends EnteranceScene{
 
 
@@ -44,7 +46,7 @@ public class LogInScene extends EnteranceScene{
     }
 
     @Override
-    public void operation()
+    public void operation(Socket server)
     {
         op.setOnMouseEntered(e->{
             op.setImage(logInWhite);

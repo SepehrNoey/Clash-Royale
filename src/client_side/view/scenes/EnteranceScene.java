@@ -1,6 +1,5 @@
 package client_side.view.scenes;
 
-import com.sun.glass.ui.Size;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -9,6 +8,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import java.net.Socket;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 
@@ -84,5 +85,5 @@ public abstract class EnteranceScene {
         });
     }
 
-    public abstract void operation();
+    public abstract void operation(Socket server);
 }
