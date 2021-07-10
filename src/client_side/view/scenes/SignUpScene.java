@@ -1,11 +1,17 @@
 package client_side.view.scenes;
 
 
+import shared.model.player.Player;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import shared.enums.MessageType;
+import shared.model.Message;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class SignUpScene extends EnteranceScene{
@@ -44,21 +50,42 @@ public class SignUpScene extends EnteranceScene{
         return signUpPage;
     }
 
-   @Override
-   public void operation(Socket server)
-   {
-       op.setOnMouseEntered(e->{
-           op.setImage(signUpWhite);
-           op.setCursor(Cursor.HAND);
-       });
+    @Override
+    public void operation(Socket server)
+    {
+        op.setOnMouseEntered(e->{
+            op.setImage(signUpWhite);
+            op.setCursor(Cursor.HAND);
+        });
 
-       op.setOnMouseExited(e->{
-           op.setImage(signUpBlack);
-       });
+        op.setOnMouseExited(e->{
+            op.setImage(signUpBlack);
+        });
 
-       op.setOnMouseClicked(e->{
-           /* database connection*/
-       });
-   }
+        op.setOnMouseClicked(e->{
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
+                ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
+
+                oos.writeObject(new Message(MessageType.SIGNUP_REQ,"player","req"));
+
+                String usr = username.getText();
+                String pass = password.getText();
+
+                oos.writeObject(usr);
+                oos.writeObject(pass);
+
+                Player serverPlayer = (Player) ois.readObject();
+
+                Player player = new Player(serverPlayer.getName(), serverPlayer.getPassword(), serverPlayer.getLevel(),
+                        serverPlayer.getXp(), serverPlayer.getCards(), server,oos,ois);
+
+            } catch (IOException ioException) {
+                System.out.println("Cannot make streams in operation...");
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            }
+        });
+    }
 
 }

@@ -1,11 +1,17 @@
 package client_side.view.scenes;
 
 
+import shared.model.player.Player;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import shared.enums.MessageType;
+import shared.model.Message;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class LogInScene extends EnteranceScene{
@@ -56,8 +62,30 @@ public class LogInScene extends EnteranceScene{
         op.setOnMouseExited(e->{
             op.setImage(logInBlack);
         });
-        op.setOnMouseClicked(e->{
-            /*database connection*/
+        op.setOnMouseClicked(e->{ // password correctness must be handled later
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
+                ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
+
+                oos.writeObject(new Message(MessageType.LOGIN_REQ,"player","req"));
+
+                String usr = username.getText();
+                String pass = password.getText();
+
+                oos.writeObject(usr);
+                oos.writeObject(pass);
+
+                Player serverPlayer = (Player) ois.readObject();
+
+                Player player = new Player(serverPlayer.getName(), serverPlayer.getPassword(), serverPlayer.getLevel(),
+                        serverPlayer.getXp(), serverPlayer.getCards(), server,oos,ois);
+
+            } catch (IOException ioException) {
+                System.out.println("Cannot make streams in operation...");
+            } catch (ClassNotFoundException classNotFoundException) {
+                System.out.println("Casting failed in operation");
+            }
+
         });
     }
 }
