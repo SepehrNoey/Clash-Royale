@@ -19,6 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class Player {
     private String name;
     private int level;
+    private int xp;
     private String password;
     private ArrayList<Card> cards;
     private Socket socket;
@@ -26,11 +27,12 @@ public class Player {
     private Sender sender;
     private ArrayBlockingQueue<Message> sharedInbox;
 
-    public Player(String name, String password , int level , ArrayList<Card> cards , Socket socket
+    public Player(String name, String password , int level ,int xp, ArrayList<Card> cards , Socket socket
             , ObjectOutputStream outObj , ObjectInputStream inObj){ // password may not be needed
         this.name = name;
         this.password = password;
         this.level = level;
+        this.xp = xp;
         this.cards = cards;
         this.socket = socket;
         this.sharedInbox = new ArrayBlockingQueue<>(50);
@@ -68,5 +70,21 @@ public class Player {
      */
     public String getName() {
         return name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public ArrayList<Card> getCards() {
+        return cards;
     }
 }
