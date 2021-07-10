@@ -1,5 +1,5 @@
 package server_side.starter;
-import shared.model.Player;
+import shared.model.player.Player;
 import server_side.manager.GameLoop;
 import server_side.model.Bot;
 import server_side.model.BotLevel1;

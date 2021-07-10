@@ -1,7 +1,7 @@
-package shared.model;
+package shared.model.player;
 
-import client_side.model.sendGet.Getter;
-import client_side.model.sendGet.Sender;
+import shared.model.player.sendGet.Getter;
+import shared.model.player.sendGet.Sender;
 import shared.model.card.Card;
 import shared.model.Message;
 
