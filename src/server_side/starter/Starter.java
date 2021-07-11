@@ -40,6 +40,7 @@ public class Starter {
         System.out.println("Server created.");
 
         ArrayBlockingQueue<Message> inGameInbox = new ArrayBlockingQueue<>(50);
+        ArrayBlockingQueue<Message> incomingEventsForBots = new ArrayBlockingQueue<>(50);
         LinkedTransferQueue<Message> gameModeMsg = new LinkedTransferQueue<>();
         LinkedTransferQueue<Message> joinGameMsg = new LinkedTransferQueue<>();
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -113,9 +114,9 @@ public class Starter {
 
         if (toWait == 0) // with bot
         {
-            Bot bot = split[2].equals("bot1") ? new BotLevel1(inGameInbox) : split[2].equals("bot2")
-                    ? new BotLevel2(inGameInbox) : new BotLevel3(inGameInbox);
-            GameLoop gameLoop = new GameLoop(players , bot);
+            Bot bot = split[2].equals("bot1") ? new BotLevel1(inGameInbox , incomingEventsForBots) : split[2].equals("bot2")
+                    ? new BotLevel2(inGameInbox , incomingEventsForBots) : new BotLevel3(inGameInbox , incomingEventsForBots);
+            GameLoop gameLoop = new GameLoop(players , bot , inGameInbox,incomingEventsForBots , executor);
             gameLoop.play();
         }
         else { // waiting for one or three players
@@ -180,7 +181,7 @@ public class Starter {
                     }
                 }
             }
-            GameLoop gameLoop = new GameLoop(players , null); // here should change for more game kinds (like bot + bot + human + human)
+            GameLoop gameLoop = new GameLoop(players , null , inGameInbox, incomingEventsForBots , executor); // here should change for more game kinds (like bot + bot + human + human)
             gameLoop.play();
         }
     }
