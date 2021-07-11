@@ -1,4 +1,5 @@
 package server_side.starter;
+import server_side.database.DBUtil;
 import shared.model.player.Player;
 import server_side.manager.GameLoop;
 import server_side.model.Bot;
@@ -186,10 +187,43 @@ public class Starter {
 
     public static Player login(Socket socket , ObjectInputStream inObj
             , ObjectOutputStream outObj){ // because player is created in this method , we need these parameters
+        try {
+            String usr = (String) inObj.readObject();
+            String pass = (String)inObj.readObject();
+
+            Player player = DBUtil.getPlayer(usr,pass,socket,outObj,inObj);
+
+            if(player!=null)
+                outObj.writeObject(player);
+
+
+            return player; // if player didn't created - null is returned
+
+        } catch (IOException e) {
+            System.out.println("Cannot read object in login method...");
+        } catch (ClassNotFoundException e) {
+            System.out.println("casting failed in login method...");
+        }
         return null; // if player didn't created - null is returned
     }
     public static Player signup(Socket socket , ObjectInputStream inObj
             , ObjectOutputStream outObj){ // because player is created in this method , we need these parameters
+        try {
+            String usr = (String) inObj.readObject();
+            String pass = (String)inObj.readObject();
+
+            Player player = DBUtil.register(usr,pass,socket,outObj,inObj);
+
+            if(player!=null)
+                outObj.writeObject(player);
+
+            return player; // if player didn't created - null is returned
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         return null; // if player didn't created - null is returned
     }
 
