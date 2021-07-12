@@ -1,5 +1,6 @@
-package shared.model.card;
+package shared.model.troops.card;
 
+import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import shared.enums.CardTypes;
 import shared.enums.SpeedTypes;
@@ -15,9 +16,9 @@ public class SoldierCard extends Card{
 
     public SoldierCard(CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                        int width , int height , double range , TargetTypes target , int count , boolean areaSplash ,
-                       SpeedTypes movingSpeed , double hitSpeed , int hp , String walkFrmPath , int walkFrmNum , String dieFrmPath , int dieFrmNum)
+                       Point2D coordinates , String owner, SpeedTypes movingSpeed , double hitSpeed , int hp , String walkFrmPath , int walkFrmNum , String dieFrmPath , int dieFrmNum)
     {
-        super(type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash);
+        super(type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner);
         this.movingSpeed = movingSpeed;
         this.hitSpeed = hitSpeed;
         this.hp = hp;

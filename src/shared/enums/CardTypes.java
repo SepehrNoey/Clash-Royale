@@ -1,6 +1,8 @@
 package shared.enums;
 
-public enum CardTypes {
+import java.io.Serializable;
+
+public enum CardTypes implements Serializable {
     BARBARIAN,
     ARCHER,
     BABY_DRAGON,

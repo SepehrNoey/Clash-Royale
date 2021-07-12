@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import java.net.Socket;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
+import shared.model.player.Player;
 
 public abstract class EnteranceScene {
 
@@ -85,5 +86,13 @@ public abstract class EnteranceScene {
         });
     }
 
-    public abstract void operation(Socket server);
+    public abstract void operation(Socket server,Scene scene);
+
+    public void loadMenu(Player player, Scene scene)
+    {
+        MenuScene menu = new MenuScene();
+
+        scene.setRoot(menu.buildScene());
+        menu.enableController(player,scene);
+    }
 }

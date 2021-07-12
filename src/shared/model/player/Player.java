@@ -2,11 +2,12 @@ package shared.model.player;
 
 import shared.model.player.sendGet.Getter;
 import shared.model.player.sendGet.Sender;
-import shared.model.card.Card;
+import shared.model.troops.card.Card;
 import shared.model.Message;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -16,16 +17,16 @@ import java.util.concurrent.ArrayBlockingQueue;
  *
  * @version 1.0
  */
-public class Player {
+public class Player implements Serializable {
     private String name;
     private int level;
     private int xp;
     private String password;
     private ArrayList<Card> cards;
-    private Socket socket;
-    private Getter getter;
-    private Sender sender;
-    private ArrayBlockingQueue<Message> sharedInbox;
+    private transient Socket socket;
+    private transient Getter getter;
+    private transient Sender sender;
+    private transient ArrayBlockingQueue<Message> sharedInbox;
 
     public Player(String name, String password , int level ,int xp, ArrayList<Card> cards , Socket socket
             , ObjectOutputStream outObj , ObjectInputStream inObj){ // password may not be needed

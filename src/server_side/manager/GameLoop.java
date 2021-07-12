@@ -31,6 +31,8 @@ public class GameLoop {
     public void play(){
         executor.execute(logic);
         Message event = null;
+        // we have to send configs here !!! (level 3 tower , level 2 barbarian ...)
+
         while (true)
         {
             try {

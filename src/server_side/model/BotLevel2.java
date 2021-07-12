@@ -17,7 +17,7 @@ public class BotLevel2 extends Bot implements Runnable{
 
     @Override
     public void run(){
-        if (getIncomingEvents().isEmpty())
+//        if (getIncomingEvents().isEmpty())
         // in this level bot or upper if elixir exists , then checking the incomingEvents and also making decision happens
 
 

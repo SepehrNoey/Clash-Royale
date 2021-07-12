@@ -1,6 +1,6 @@
 package server_side.model;
 
-import shared.model.card.Card;
+import shared.model.troops.card.Card;
 import shared.model.Message;
 
 import java.util.ArrayList;

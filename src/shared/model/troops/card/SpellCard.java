@@ -1,5 +1,6 @@
-package shared.model.card;
+package shared.model.troops.card;
 
+import javafx.geometry.Point2D;
 import shared.enums.CardTypes;
 import shared.enums.SpeedTypes;
 import shared.enums.TargetTypes;
@@ -12,10 +13,11 @@ public class SpellCard extends Card{
     private boolean reducedDmg; // reduced damage to crown towers
 
     public SpellCard(CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
-                     int width , int height , double range , TargetTypes target , int count , boolean areaSplash , SpeedTypes movingSpeed ,
+                     int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates,
+            String owner, SpeedTypes movingSpeed ,
                      int damageBoost , int speedBoost , int hitSpeedBoost , boolean reducedDmg)
     {
-        super(type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash);
+        super(type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner);
         this.movingSpeed = movingSpeed;
         this.damageBoost = damageBoost;
         this.speedBoost = speedBoost;

@@ -31,8 +31,8 @@ public class Starter extends Application {
             mainPage.enableController(scene,signUpScene.buildScene(), logInScene.buildScene());
             signUpScene.enableController(scene,mainScene);
             logInScene.enableController(scene,mainScene);
-            signUpScene.operation(server);
-            logInScene.operation(server);
+            signUpScene.operation(server,scene);
+            logInScene.operation(server,scene);
 
             stage.setTitle("Button Graphics");
             stage.setScene(scene);

@@ -1,6 +1,7 @@
 package client_side.view.scenes;
 
 
+import javafx.scene.Scene;
 import shared.model.player.Player;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -51,7 +52,7 @@ public class SignUpScene extends EnteranceScene{
     }
 
     @Override
-    public void operation(Socket server)
+    public void operation(Socket server, Scene scene)
     {
         op.setOnMouseEntered(e->{
             op.setImage(signUpWhite);
@@ -79,6 +80,9 @@ public class SignUpScene extends EnteranceScene{
 
                 Player player = new Player(serverPlayer.getName(), serverPlayer.getPassword(), serverPlayer.getLevel(),
                         serverPlayer.getXp(), serverPlayer.getCards(), server,oos,ois);
+
+
+                loadMenu(player,scene);
 
             } catch (IOException ioException) {
                 System.out.println("Cannot make streams in operation...");
