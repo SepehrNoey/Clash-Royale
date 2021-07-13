@@ -12,11 +12,11 @@ public class Tower extends Troop{
     private ImageView base;
     private ImageView head;
 
-    public Tower(int damage, int level, String attackFrmPath, int attackFrmNum, int width,
+    public Tower(boolean isServerSide,int damage, int level, String attackFrmPath, int attackFrmNum, int width,
                  int height, double range, TargetTypes target, TowerTypes type, int hp,
                  double hitSpeed, ImageView base, ImageView head , Point2D coordinates , String owner)
     {
-        super(damage, level, attackFrmPath, attackFrmNum, width, height, range, target ,coordinates , owner);
+        super(isServerSide, damage, level, attackFrmPath, attackFrmNum, width, height, range, target ,coordinates , owner);
         this.type = type;
         this.hp = hp;
         this.hitSpeed = hitSpeed;

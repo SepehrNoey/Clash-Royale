@@ -5,8 +5,9 @@ import shared.model.Message;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class BotLevel2 extends Bot implements Runnable{
-    public BotLevel2(ArrayBlockingQueue<Message> inGameInbox , ArrayBlockingQueue<Message> incomingEvents){
-        super(inGameInbox, incomingEvents);
+    public BotLevel2(ArrayBlockingQueue<Message> inGameInbox , ArrayBlockingQueue<Message> incomingEvents , int level){
+        super(inGameInbox, incomingEvents , level);
+        setName("Bot 2");
 
     }
 

@@ -105,23 +105,22 @@ public class Starter {
         // here , waits until the first player sends the gameModeMessage
 
         try{
-            gameMode = gameModeMsg.take(); // at this time we should render a raw board at client side!!!
+            gameMode = gameModeMsg.take(); // special content : 1v1 or 2v2 or bot1 or bot2 or bot3
         }catch (InterruptedException e)
         {
             System.out.println("Interrupted in getting gameModeMsg. Exiting...");
             System.exit(-1);
         }
 
-        String[] split = gameMode.getContent().split(","); // special content : 1v1 or 2v2 , PvB or PvP , bot1 or bot2 or bot3 (if exist - just for play with bot)
-        // three game modes = player vs bot , player vs player , 4 players
-        int toWait = split[0].equals("1v1") && split[1].equals("PvB") ? 0 : split[0].equals("1v1") && split[1].equals("PvP") ? 1 : 3 ;
+        int toWait = (gameMode.getContent().equals("bot1")  || gameMode.getContent().equals("bot2") || gameMode.getContent().equals("bot3")) ? 0
+                : gameMode.getContent().equals("1v1") ? 1 : 3 ;
 
         // players should join one by one
 
         if (toWait == 0) // with bot
         {
-            Bot bot = split[2].equals("bot1") ? new BotLevel1(inGameInbox , incomingEventsForBots) : split[2].equals("bot2")
-                    ? new BotLevel2(inGameInbox , incomingEventsForBots) : new BotLevel3(inGameInbox , incomingEventsForBots);
+            Bot bot = gameMode.getContent().equals("bot1") ? new BotLevel1(inGameInbox , incomingEventsForBots , players.get(0).getLevel()) : gameMode.getContent().equals("bot2")
+                    ? new BotLevel2(inGameInbox , incomingEventsForBots , players.get(0).getLevel()) : new BotLevel3(inGameInbox , incomingEventsForBots , players.get(0).getLevel());
             GameLoop gameLoop = new GameLoop(players , bot , inGameInbox,incomingEventsForBots , executor);
             gameLoop.play();
         }

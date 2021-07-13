@@ -15,13 +15,14 @@ public abstract class Card extends Troop implements Serializable {
     private int count;
     private boolean areaSplash;
 
-    public Card(CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
+    public Card(boolean isServerSide,CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                 int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates , String owner)
     {
-        super(damage, level, attackFrmPath, attackFrmNum, width, height, range, target, coordinates , owner);
+        super(isServerSide,damage, level, attackFrmPath, attackFrmNum, width, height, range, target, coordinates , owner);
         this.type = type;
         this.cost = cost;
-        cardImage = new Image(cardImagePath);
+        if (!isServerSide)
+            cardImage = new Image(cardImagePath);
         this.count = count;
         this.areaSplash = areaSplash;
     }

@@ -35,7 +35,7 @@ public class Player implements Serializable {
     private transient ArrayBlockingQueue<Message> sharedInbox;
 
 
-    public Player(String name, String password , int level ,int xp, ArrayList<Card> cards , Socket socket
+    public Player(boolean isServerSide,String name, String password , int level ,int xp, ArrayList<Card> cards , Socket socket
             , ObjectOutputStream outObj , ObjectInputStream inObj){ // password may not be needed
         this.name = name;
         this.password = password;
@@ -44,9 +44,9 @@ public class Player implements Serializable {
         this.cards = cards;
         allTroops = new ArrayList<>(cards); // attention !!! imageView should be added later! - and also player is considered in bottom of board! - handle later
         // attention !! point2D is addressed by index  0 to MAX !!! - like Board
-        allTroops.add(Troop.makeTroop(TowerTypes.KING_TOWER.toString() , level , new Point2D(8,24) , name,null , null));
-        allTroops.add(Troop.makeTroop(TowerTypes.PRINCESS_TOWER.toString() , level , new Point2D(3,23) , name,null , null));
-        allTroops.add(Troop.makeTroop(TowerTypes.PRINCESS_TOWER.toString() , level , new Point2D(14,23) , name,null , null));
+        allTroops.add(Troop.makeTroop(isServerSide,TowerTypes.KING_TOWER.toString() , level , new Point2D(8,24) , name,null , null));
+        allTroops.add(Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , level , new Point2D(3,23) , name,null , null));
+        allTroops.add(Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , level , new Point2D(14,23) , name,null , null));
         deck = new ArrayList<>();
         for(int i = 0 ; i < 8 ; i++)
         {

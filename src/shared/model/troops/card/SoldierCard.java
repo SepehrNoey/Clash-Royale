@@ -14,23 +14,22 @@ public class SoldierCard extends Card{
     private Image[] dieFrames;
 
 
-    public SoldierCard(CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
+    public SoldierCard(boolean isServerSide,CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                        int width , int height , double range , TargetTypes target , int count , boolean areaSplash ,
                        Point2D coordinates , String owner, SpeedTypes movingSpeed , double hitSpeed , int hp , String walkFrmPath , int walkFrmNum , String dieFrmPath , int dieFrmNum)
     {
-        super(type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner);
+        super(isServerSide, type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner);
         this.movingSpeed = movingSpeed;
         this.hitSpeed = hitSpeed;
         this.hp = hp;
         walkFrames = new Image[walkFrmNum];
-        for (int i = 0; i < walkFrmNum ; i++)
-        {
-            walkFrames[i] = new Image(walkFrmPath + i + ".png");
-        }
         dieFrames = new Image[dieFrmNum];
-        for (int i = 0 ; i < dieFrmNum ; i++)
+        if(!isServerSide)
         {
-            dieFrames[i] = new Image(dieFrmPath + i + ".png");
+            for (int i = 0; i < walkFrmNum ; i++)
+                walkFrames[i] = new Image(walkFrmPath + i + ".png");
+            for (int i = 0 ; i < dieFrmNum ; i++)
+                dieFrames[i] = new Image(dieFrmPath + i + ".png");
         }
     }
 

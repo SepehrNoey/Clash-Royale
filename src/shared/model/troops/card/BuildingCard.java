@@ -12,15 +12,15 @@ public class BuildingCard extends Card {
     private int lifeTime;
     private int hp;
 
-    public BuildingCard(CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
+    public BuildingCard(boolean isServerSide,CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                         int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates,String owner, String dieFrmPath , int dieFrmNum , double hitSpeed , int lifeTime , int hp)
     {
-        super(type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count , areaSplash ,coordinates , owner);
+        super(isServerSide,type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count , areaSplash ,coordinates , owner);
         dieFrames = new Image[dieFrmNum];
-        for (int i = 0 ; i < dieFrmNum ; i++)
-        {
-            dieFrames[i] = new Image(dieFrmPath + i + ".png");
-        }
+        if (!isServerSide)
+            for (int i = 0 ; i < dieFrmNum ; i++)
+                dieFrames[i] = new Image(dieFrmPath + i + ".png");
+
         this.hitSpeed = hitSpeed;
         this.lifeTime = lifeTime;
         this.hp = hp;

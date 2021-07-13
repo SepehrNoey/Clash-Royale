@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import shared.enums.MessageType;
+import shared.model.Message;
 import shared.model.player.Player;
 
 public class MenuScene {
@@ -181,7 +183,7 @@ public class MenuScene {
             bot1.setImage(bot1Black);
         });
         bot1.setOnMouseClicked(e->{
-
+            player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot1"));
         });
 
 
@@ -193,7 +195,7 @@ public class MenuScene {
             bot2.setImage(bot2Black);
         });
         bot2.setOnMouseClicked(e->{
-
+            player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot2"));
         });
 
         v1.setOnMouseEntered(e->{
@@ -204,7 +206,7 @@ public class MenuScene {
             v1.setImage(v1Black);
         });
         v1.setOnMouseClicked(e->{
-
+            player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"1v1"));
         });
 
         v2.setOnMouseEntered(e->{
@@ -215,7 +217,7 @@ public class MenuScene {
             v2.setImage(v2Black);
         });
         v2.setOnMouseClicked(e->{
-
+            player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"2v2"));
         });
 
         logOut.setOnMouseEntered(e->{
