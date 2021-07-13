@@ -83,7 +83,6 @@ public class DBUtil {
             Statement cardSt = connection.createStatement();
 //            String[] types = new String[]{"BARBARIAN" , "ARCHER" , "BABY_DRAGON" , "WIZARD" ,"MINI_PEKKA" , "GIANT" , "VALKYRIE" , "RAGE"
 //                    ,"FIREBALL" ,"ARROWS", "CANNON", "INFERNO_TOWER"};
-//
 //            for (int i = 0 ; i < 12 ; i++)
 
 
