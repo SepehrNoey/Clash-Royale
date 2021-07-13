@@ -44,8 +44,8 @@ public class GameLoop {
             }
             notifyPlayers(event);
             logic.addToCheckEvent(event);
-            if (logic.isFinished()) // handle later
-                break;
+//            if (logic.isFinished()) // handle later
+//                break;
         }
     }
 

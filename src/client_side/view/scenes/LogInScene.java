@@ -9,17 +9,26 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import shared.enums.MessageType;
 import shared.model.Message;
+import shared.model.troops.Troop;
+import shared.model.troops.card.Card;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
 
 public class LogInScene extends EnteranceScene{
 
 
     private Image logInBlack;
     private Image logInWhite;
+
+    public LogInScene(ExecutorService executor)
+    {
+        super(executor);
+    }
 
     @Override
     public Group buildScene()
@@ -68,18 +77,28 @@ public class LogInScene extends EnteranceScene{
                 ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
                 ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
 
-                oos.writeObject(new Message(MessageType.LOGIN_REQ,"player","req"));
+                oos.writeObject(new Message(MessageType.LOGIN_REQ,username.getText(),password.getText()));
 
-                String usr = username.getText();
-                String pass = password.getText();
+                Message result = (Message) ois.readObject();
+                Player player = null;
+                if (result.getType() == MessageType.REFUSED)
+                {
+                    username.setPromptText("Username or password incorrect!");
+                    username.selectAll();
+                    username.requestFocus();
+                }
+                else { // accepted
+                    String[] split = result.getContent().split(",");
+                    ArrayList<Card> cards = new ArrayList<>();
+                    for(int i = 0 ; i < 12 ; i++)
+                    {
+                        cards.add((Card) Troop.makeTroop(split[i + 4] , Integer.parseInt(split[1]) , null,split[0],null,null));
+                    }
+                    player = new Player(split[0] , split[3] , Integer.parseInt(split[1]) , Integer.parseInt(split[2]) , cards,server,oos,ois);
+                    executor.execute(player.getGetter());
+                }
 
-                oos.writeObject(usr);
-                oos.writeObject(pass);
-
-                Player serverPlayer = (Player) ois.readObject();
-
-                Player player = new Player(serverPlayer.getName(), serverPlayer.getPassword(), serverPlayer.getLevel(),
-                        serverPlayer.getXp(), serverPlayer.getCards(), server,oos,ois);
+                // now a player is created
 
                 loadMenu(player,scene);
 

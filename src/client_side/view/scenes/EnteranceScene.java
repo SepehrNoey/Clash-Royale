@@ -10,6 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+
 import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import shared.model.player.Player;
@@ -24,11 +26,12 @@ public abstract class EnteranceScene {
     protected PasswordField password;
     protected Label usernameLable;
     protected Label passwordLable;
-
     protected ImageView op;
+    protected ExecutorService executor;
 
-    public EnteranceScene()
+    public EnteranceScene(ExecutorService executor)
     {
+        this.executor = executor;
         backBlack = new Image("client_side/view/pics/backBlack.png");
         backWhite = new Image("client_side/view/pics/backWhite.png");
         back = new ImageView(backBlack);

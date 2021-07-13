@@ -2,6 +2,7 @@ package shared.model.player;
 
 import shared.model.player.sendGet.Getter;
 import shared.model.player.sendGet.Sender;
+import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 import shared.model.Message;
 
@@ -22,11 +23,14 @@ public class Player implements Serializable {
     private int level;
     private int xp;
     private String password;
+    private ArrayList<Troop> allTroops;
     private ArrayList<Card> cards;
+    private ArrayList<Card> deck;
     private transient Socket socket;
     private transient Getter getter;
     private transient Sender sender;
     private transient ArrayBlockingQueue<Message> sharedInbox;
+
 
     public Player(String name, String password , int level ,int xp, ArrayList<Card> cards , Socket socket
             , ObjectOutputStream outObj , ObjectInputStream inObj){ // password may not be needed
@@ -34,11 +38,18 @@ public class Player implements Serializable {
         this.password = password;
         this.level = level;
         this.xp = xp;
+        allTroops = new ArrayList<>(); // !!!
         this.cards = cards;
+        deck = new ArrayList<>();
+        for(int i = 0 ; i < 8 ; i++)
+        {
+            deck.add(cards.get(i)); // first 8 cards are deck
+        }
         this.socket = socket;
         this.sharedInbox = new ArrayBlockingQueue<>(50);
         this.getter = new Getter(inObj , sharedInbox);
         this.sender = new Sender(outObj);
+
     }
 
     /**
@@ -88,4 +99,8 @@ public class Player implements Serializable {
     public ArrayList<Card> getCards() {
         return cards;
     }
+
+    public void setBattleDeck(){ // for updating deck..
+    }
+
 }

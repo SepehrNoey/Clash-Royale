@@ -44,6 +44,7 @@ public class Starter {
         LinkedTransferQueue<Message> gameModeMsg = new LinkedTransferQueue<>();
         LinkedTransferQueue<Message> joinGameMsg = new LinkedTransferQueue<>();
         ExecutorService executor = Executors.newCachedThreadPool();
+        DBUtil dbUtil = new DBUtil();
 
 
         // first player login or signup and also creating a new game
@@ -72,14 +73,19 @@ public class Starter {
 
             if (firstPlayerLoginMsg.getType() == MessageType.LOGIN_REQ) // login for first player
             {
-                firstPlayer = login(firstPlayerSocket,oisFirst,oosFirst);
+                firstPlayer = signupOrLogin("login",firstPlayerLoginMsg,firstPlayerSocket,oisFirst,oosFirst , dbUtil);
             }
             else
             {
-                firstPlayer = signup(firstPlayerSocket,oisFirst,oosFirst); // signup for first player
+                firstPlayer = signupOrLogin("signup",firstPlayerLoginMsg,firstPlayerSocket,oisFirst,oosFirst ,dbUtil); // signup for first player
             }
             if (firstPlayer != null) // accepted
             {
+                String cards = "";
+                for (int i = 0 ; i < 12 ; i++)
+                    cards += firstPlayer.getCards().get(i).getType().toString() + ",";
+                firstPlayer.getSender().sendMsg(new Message(MessageType.DATA , "Server" , firstPlayer.getName() + ","
+                        + firstPlayer.getLevel() + "," + firstPlayer.getXp() + "," + firstPlayer.getPassword() + "," + cards));
                 players.add(firstPlayer);
                 MsgSeparator msgSeparator = new MsgSeparator(firstPlayer.getSharedInbox(), gameModeMsg ,joinGameMsg , inGameInbox); // from now all messages are got from Getter!!
                 executor.execute(firstPlayer.getGetter());
@@ -138,15 +144,18 @@ public class Starter {
                     try {
                         msg = (Message) ois.readObject();
                         if (msg.getType() == MessageType.LOGIN_REQ) {
-                            // database work
-                            player = login(socket, ois, oos);
+                            player = signupOrLogin("login",msg,socket, ois, oos , dbUtil);
                         } else // signup request
                         {
-                            // database work
-                            player = signup(socket, ois, oos);
+                            player = signupOrLogin("signup",msg,socket, ois, oos , dbUtil);
                         }
                         if (player != null) // accepted
                         {
+                            String cards = "";
+                            for (int j = 0 ; j < 12 ; j++)
+                                cards += player.getCards().get(j).getType().toString() + ",";
+                            player.getSender().sendMsg(new Message(MessageType.DATA , "Server" , player.getName() + ","
+                                    + player.getLevel() + "," + player.getXp() + "," + player.getPassword() + "," + cards));
                             MsgSeparator msgSeparator = new MsgSeparator(player.getSharedInbox(), gameModeMsg, joinGameMsg, inGameInbox); // from now all messages are got from Getter!!
                             executor.execute(player.getGetter());
                             executor.execute(msgSeparator);
@@ -185,47 +194,16 @@ public class Starter {
             gameLoop.play();
         }
     }
+    public static Player signupOrLogin(String singOrLog , Message req,Socket socket , ObjectInputStream inObj
+            , ObjectOutputStream outObj , DBUtil dbUtil){ // because player is created in this method , we need these parameters
 
-    public static Player login(Socket socket , ObjectInputStream inObj
-            , ObjectOutputStream outObj){ // because player is created in this method , we need these parameters
-        try {
-            String usr = (String) inObj.readObject();
-            String pass = (String)inObj.readObject();
-
-            Player player = DBUtil.getPlayer(usr,pass,socket,outObj,inObj);
-
-            if(player!=null)
-                outObj.writeObject(player);
-
+            Player player = null;
+            if (singOrLog.equals("signup"))
+                player = dbUtil.register(req.getSender(), req.getContent(),socket,outObj,inObj);
+            else
+                player = dbUtil.getPlayer(req.getSender(), req.getContent(),socket,outObj,inObj);
 
             return player; // if player didn't created - null is returned
-
-        } catch (IOException e) {
-            System.out.println("Cannot read object in login method...");
-        } catch (ClassNotFoundException e) {
-            System.out.println("casting failed in login method...");
-        }
-        return null; // if player didn't created - null is returned
-    }
-    public static Player signup(Socket socket , ObjectInputStream inObj
-            , ObjectOutputStream outObj){ // because player is created in this method , we need these parameters
-        try {
-            String usr = (String) inObj.readObject();
-            String pass = (String)inObj.readObject();
-
-            Player player = DBUtil.register(usr,pass,socket,outObj,inObj);
-
-            if(player!=null)
-                outObj.writeObject(player);
-
-            return player; // if player didn't created - null is returned
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null; // if player didn't created - null is returned
     }
 
 }

@@ -2137,7 +2137,7 @@
    </ImageView>
    <ImageView fx:id="upLeftWeaponHead" fitHeight="90.0" fitWidth="90.0" layoutX="90.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true" rotate="180.0">
       <image>
-         <Image url="@../pics/towerDefense_tile204.png" />
+         <Image url="@../pics/princessTowerHead0.png" />
       </image>
    </ImageView>
    <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="90.0" layoutY="720.0" pickOnBounds="true" preserveRatio="true">
@@ -2192,7 +2192,7 @@
    </ImageView>
    <ImageView fx:id="downLeftWeaponHead" fitHeight="90.0" fitWidth="90.0" layoutX="90.0" layoutY="710.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="@../pics/towerDefense_tile204.png" />
+         <Image url="@../pics/princessTowerHead0.png" />
       </image>
    </ImageView>
    <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="270.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
@@ -2247,7 +2247,7 @@
    </ImageView>
    <ImageView fx:id="upBigWeaponHead" fitHeight="90.0" fitWidth="90.0" layoutX="270.0" layoutY="75.0" pickOnBounds="true" preserveRatio="true" rotate="180.0">
       <image>
-         <Image url="@../pics/towerDefense_tile250.png" />
+         <Image url="@../pics/kingTowerHead0.png" />
       </image>
    </ImageView>
    <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="450.0" layoutY="180.0" pickOnBounds="true" preserveRatio="true">
@@ -2522,7 +2522,7 @@
    </ImageView>
    <ImageView fx:id="upRightWeaponHead" fitHeight="90.0" fitWidth="90.0" layoutX="450.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true" rotate="180.0">
       <image>
-         <Image url="@../pics/towerDefense_tile204.png" />
+         <Image url="@../pics/princessTowerHead0.png" />
       </image>
    </ImageView>
    <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="330.0" layoutY="780.0" pickOnBounds="true" preserveRatio="true">
@@ -2577,7 +2577,7 @@
    </ImageView>
    <ImageView fx:id="downBigWeaponHead" fitHeight="90.0" fitWidth="90.0" layoutX="270.0" layoutY="735.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="@../pics/towerDefense_tile250.png" />
+         <Image url="@../pics/kingTowerHead0.png" />
       </image>
    </ImageView>
    <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="509.0" layoutY="750.0" pickOnBounds="true" preserveRatio="true">
@@ -2632,7 +2632,7 @@
    </ImageView>
    <ImageView fx:id="downRightWeaponHead" fitHeight="90.0" fitWidth="90.0" layoutX="450.0" layoutY="710.0" pickOnBounds="true" preserveRatio="true">
       <image>
-         <Image url="@../pics/towerDefense_tile204.png" />
+         <Image url="@../pics/princessTowerHead0.png" />
       </image>
    </ImageView>
    <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="180.0" layoutY="780.0" pickOnBounds="true" preserveRatio="true">

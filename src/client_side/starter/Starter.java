@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Starter extends Application {
 
@@ -22,10 +24,11 @@ public class Starter extends Application {
         // connecting to server
         try {
             Socket server = new Socket("127.0.0.1",7000);
+            ExecutorService executor = Executors.newCachedThreadPool();
 
             MainScene mainPage = new MainScene();
-            EnteranceScene signUpScene = new SignUpScene();
-            EnteranceScene logInScene = new LogInScene();
+            EnteranceScene signUpScene = new SignUpScene(executor);
+            EnteranceScene logInScene = new LogInScene(executor);
             Group mainScene = mainPage.buildScene();
             Scene scene = new Scene(mainScene,630,900,Color.GREENYELLOW);
             mainPage.enableController(scene,signUpScene.buildScene(), logInScene.buildScene());

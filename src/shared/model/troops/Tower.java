@@ -8,13 +8,13 @@ import shared.enums.TowerTypes;
 public class Tower extends Troop{
     private TowerTypes type;
     private int hp;
-    private int hitSpeed;
+    private double hitSpeed;
     private ImageView base;
     private ImageView head;
 
     public Tower(int damage, int level, String attackFrmPath, int attackFrmNum, int width,
                  int height, double range, TargetTypes target, TowerTypes type, int hp,
-                 int hitSpeed, ImageView base, ImageView head , Point2D coordinates , String owner)
+                 double hitSpeed, ImageView base, ImageView head , Point2D coordinates , String owner)
     {
         super(damage, level, attackFrmPath, attackFrmNum, width, height, range, target ,coordinates , owner);
         this.type = type;
@@ -44,7 +44,7 @@ public class Tower extends Troop{
      * getter
      * @return hitSpeed
      */
-    public int getHitSpeed() {
+    public double getHitSpeed() {
         return hitSpeed;
     }
 

@@ -19,4 +19,5 @@ public enum MessageType implements Serializable {
     PLAYER_JOINED,
 
     PICKED_CARD, // with this messageType , content of message should be special : Barbarian_5_7 (tile 5 , 7)
+    DATA,
 }

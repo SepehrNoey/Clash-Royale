@@ -26,9 +26,9 @@ public class Logic implements Runnable {
         this.toCheckEvents = toCheckEvents;
     }
 
-    public boolean isFinished(){
-        // if finished , then cancel the timer
-    }
+//    public boolean isFinished(){
+//        // if finished , then cancel the timer
+//    }
 
     public void timeEnded(){
 
