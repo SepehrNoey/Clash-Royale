@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Starter extends Application {
-
+    public static Stage stage;
 
     @Override
     public void start(Stage stage){
@@ -25,7 +25,7 @@ public class Starter extends Application {
         try {
             Socket server = new Socket("127.0.0.1",7000);
             ExecutorService executor = Executors.newCachedThreadPool();
-
+            this.stage = stage;
             MainScene mainPage = new MainScene();
             EnteranceScene signUpScene = new SignUpScene(executor);
             EnteranceScene logInScene = new LogInScene(executor);

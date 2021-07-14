@@ -37,7 +37,7 @@ public class DBUtil {
                 {
                     ArrayList<Card> cards = new ArrayList<>();
                     Card card;
-                    String tableName = usr +" cards";
+                    String tableName = usr +"_cards";
                     ResultSet cardsSet = connection.createStatement().executeQuery("SELECT * FROM "+tableName);
 
                     for (int i = 0 ; i < 12 ; i++) // 12 cards
@@ -70,7 +70,7 @@ public class DBUtil {
             sb.setLength(0);
             sb.append("CREATE TABLE ");
             sb.append(tableName);
-            sb.append("(`type` VARCHAR(255), `level` INT , damage INT , hp INT , PRIMARY KEY(`type`))");
+            sb.append("(`type` VARCHAR(255), `level` INT , PRIMARY KEY(`type`))");
 
             ArrayList<Card> cards = new ArrayList<>();
             Card card;
@@ -84,8 +84,8 @@ public class DBUtil {
             {
                 sb.setLength(0);
                 sb.append("'");sb.append(types.toString());sb.append("'");
-                cardSt.executeUpdate("INSERT INTO "+tableName+" (`type`,`level`,damage,hp) VALUES" +
-                        " ("+sb.toString()+",1,75,300)");
+                cardSt.executeUpdate("INSERT INTO "+tableName+" (`type`,`level`) VALUES" +
+                        " ("+sb.toString()+",1)");
                 card = (Card) Troop.makeTroop(true,types.toString() , 1 , null,usr , null,null);
                 cards.add(card);
             }

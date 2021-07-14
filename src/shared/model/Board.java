@@ -2,6 +2,7 @@ package shared.model;
 
 import shared.enums.BoardThings;
 import shared.enums.BoardTypes;
+import shared.enums.TowerTypes;
 import shared.model.troops.Tower;
 import shared.model.troops.Troop;
 
@@ -11,11 +12,13 @@ public class Board {
     private BoardThings[][] board;
     private BoardTypes type;
     private ArrayList<Troop> addedTroops;
+    private boolean isServerSide;
 
-    public Board(BoardTypes type){
+    public Board(BoardTypes type , boolean isServerSide , String humanPlayer){
         this.type = type;
         board = new BoardThings[21][30];
-
+        this.isServerSide = isServerSide;
+        makeRawBoard();
     }
 
 
@@ -110,11 +113,9 @@ public class Board {
                     if (board[i][j] == null)
                         board[i][j] = BoardThings.GRASS;
 
-            // adding towers
 
-//            addedTroops.add(new Tower())
         }
-        else {
+        else { // four player board
 
         }
     }
@@ -124,4 +125,11 @@ public class Board {
         addedTroops.add(troop);
     }
 
+    /**
+     * getter
+     * @return type of board
+     */
+    public BoardTypes getType() {
+        return type;
+    }
 }

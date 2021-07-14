@@ -1,5 +1,6 @@
 package server_side.manager;
 
+import shared.enums.MessageType;
 import shared.model.player.Player;
 import server_side.model.Bot;
 import shared.model.Message;
@@ -15,10 +16,11 @@ public class GameLoop {
     private ArrayBlockingQueue<Message> incomingEventsForBots;
     private Logic logic;
     private ExecutorService executor;
+    private String gameMode;
 
-
-    public GameLoop(ArrayList<Player> players, Bot bot , ArrayBlockingQueue<Message> inGameInbox ,
+    public GameLoop(String gameMode,ArrayList<Player> players, Bot bot , ArrayBlockingQueue<Message> inGameInbox ,
                     ArrayBlockingQueue<Message> incomingEventsForBots ,ExecutorService executor){
+        this.gameMode = gameMode;
         this.players = players;
         if (bot != null)
             this.bot = bot;
@@ -31,8 +33,17 @@ public class GameLoop {
     public void play(){
         executor.execute(logic);
         Message event = null;
-
-        // we have to send configs here(for 1v1 or 2v2 ...) !!! (level 3 tower , level 2 barbarian ...)
+//        String playersLevels = ""; // attention ! this is just implemented for total two players !!!
+//        for (Player player: players) // have to change for more players
+//            playersLevels += player.getName() + "_" + "Lvl " + player.getLevel();
+//        for (Player player: players) // just sending for humans - data of other players
+//        {
+//            player.getSender().sendMsg(new Message(MessageType.DATA , "Server",playersLevels));
+//        }
+        for (Player player: players)
+        {
+            player.getSender().sendMsg(new Message(MessageType.DATA , "Server" , bot.getName() + "," + bot.getLevel())); // just implemented for bot!!!
+        }
 
         while (true)
         {

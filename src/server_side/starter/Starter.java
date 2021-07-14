@@ -121,7 +121,7 @@ public class Starter {
         {
             Bot bot = gameMode.getContent().equals("bot1") ? new BotLevel1(inGameInbox , incomingEventsForBots , players.get(0).getLevel()) : gameMode.getContent().equals("bot2")
                     ? new BotLevel2(inGameInbox , incomingEventsForBots , players.get(0).getLevel()) : new BotLevel3(inGameInbox , incomingEventsForBots , players.get(0).getLevel());
-            GameLoop gameLoop = new GameLoop(players , bot , inGameInbox,incomingEventsForBots , executor);
+            GameLoop gameLoop = new GameLoop(gameMode.getContent(),players , bot , inGameInbox,incomingEventsForBots , executor);
             gameLoop.play();
         }
         else { // waiting for one or three players
@@ -189,7 +189,7 @@ public class Starter {
                     }
                 }
             }
-            GameLoop gameLoop = new GameLoop(players , null , inGameInbox, incomingEventsForBots , executor); // here should change for more game kinds (like bot + bot + human + human)
+            GameLoop gameLoop = new GameLoop(gameMode.getContent(),players , null , inGameInbox, incomingEventsForBots , executor); // here should change for more game kinds (like bot + bot + human + human)
             gameLoop.play();
         }
     }

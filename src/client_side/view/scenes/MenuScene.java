@@ -1,5 +1,6 @@
 package client_side.view.scenes;
 
+import client_side.manager.Manager;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -184,6 +185,8 @@ public class MenuScene {
         });
         bot1.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot1"));
+            Manager manager = new Manager(player , "bot1",scene);
+            manager.start();
         });
 
 
@@ -196,6 +199,8 @@ public class MenuScene {
         });
         bot2.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot2"));
+            Manager manager = new Manager(player , "bot2",scene);
+            manager.start();
         });
 
         v1.setOnMouseEntered(e->{
@@ -207,6 +212,8 @@ public class MenuScene {
         });
         v1.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"1v1"));
+            Manager manager = new Manager(player , "1v1",scene);
+            manager.start();
         });
 
         v2.setOnMouseEntered(e->{
@@ -218,6 +225,8 @@ public class MenuScene {
         });
         v2.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"2v2"));
+            Manager manager = new Manager(player , "2v2",scene);
+            manager.start();
         });
 
         logOut.setOnMouseEntered(e->{

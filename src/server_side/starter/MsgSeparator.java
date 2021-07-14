@@ -2,6 +2,7 @@ package server_side.starter;
 
 import shared.model.Message;
 import shared.enums.MessageType;
+import shared.model.player.Player;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
