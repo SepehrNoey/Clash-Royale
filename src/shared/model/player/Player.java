@@ -1,6 +1,7 @@
 package shared.model.player;
 
 import javafx.geometry.Point2D;
+import javafx.scene.image.ImageView;
 import shared.enums.TowerTypes;
 import shared.model.player.sendGet.Getter;
 import shared.model.player.sendGet.Sender;
@@ -107,7 +108,31 @@ public class Player implements Serializable {
         return cards;
     }
 
-    public void setBattleDeck(){ // for updating deck..
+    public void setBattleDeck(ImageView[] deckView){ // for updating deck..
+
+        deck.clear();
+        for(int i=0;i<8;i++)
+            for(Card card : cards)
+                if(card.getCardImage().equals(deckView[i].getImage()))
+                    deck.add(card);
+        Card[] other = new Card[4];
+        int i=0;
+        for(Card card : cards)
+            if (!deck.contains(card))
+                other[i++] = card;
+        cards.clear();
+        i=0;
+        for(int j=0;j<8;j++)
+            cards.add(deck.get(i++));
+        for(int j=8;j<12;j++)
+            cards.add(other[j-8]);
+
+        for(Card card : cards)
+            System.out.println(card.getType());
+
     }
 
+    public ArrayList<Card> getDeck() {
+        return deck;
+    }
 }

@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -9,9 +10,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox fx:id="hBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="3.0" style="-fx-background-color: khaki;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client_side.controller.GameSceneController">
+<HBox fx:id="hBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: khaki;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client_side.controller.GameSceneController">
    <children>
-      <Pane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="630.0" style="-fx-background-color: khaki;">
+      <Pane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onDragDone="#done" onDragDropped="#handleDragDropped" onDragOver="#handleDragOver" prefHeight="900.0" prefWidth="630.0" style="-fx-background-color: khaki;">
          <children>
             <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -1184,11 +1185,6 @@
                </image>
             </ImageView>
             <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="240.0" layoutY="240.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../pics/mapTile_022.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="270.0" layoutY="240.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../pics/mapTile_022.png" />
                </image>
@@ -4553,91 +4549,77 @@
                   <Image url="@../pics/mapTile_035.png" />
                </image>
             </ImageView>
-            <Label fx:id="enemyNameLabel" layoutX="41.0" layoutY="30.0" text="Bot 1  Lvl 1">
-               <font>
-                  <Font size="19.0" />
-               </font>
-            </Label>
-            <Label fx:id="timeLabel" layoutX="565.0" layoutY="30.0" text="3:00">
+            <ImageView fitHeight="60.0" fitWidth="636.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../pics/woodForTime.jpg" />
+               </image>
+               <effect>
+                  <InnerShadow height="69.57" radius="34.285" width="69.57" />
+               </effect>
+            </ImageView>
+            <Label fx:id="timeLabel" layoutX="563.0" layoutY="13.0" text="3:00" textFill="WHITE">
                <font>
                   <Font size="20.0" />
                </font>
             </Label>
+            <Label fx:id="enemyNameLabel" layoutX="29.0" layoutY="13.0" text="Enemy Name" textFill="WHITE">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+            <Label layoutX="372.0" layoutY="13.0" text="Remainig Time :" textFill="WHITE">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+            <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="270.0" layoutY="240.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../pics/mapTile_022.png" />
+               </image>
+            </ImageView>
          </children>
       </Pane>
-      <VBox fx:id="vBox" spacing="10.0">
+      <Pane>
          <children>
-            <ImageView fx:id="card1" fitHeight="172.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="900.0" fitWidth="200.0" layoutX="3.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../pics/valkyrie.png" />
-               </image></ImageView>
-            <ImageView fx:id="card2" fitHeight="172.0" fitWidth="140.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                  <Image url="@../pics/wood2.jpg" />
+               </image>
+               <effect>
+                  <InnerShadow height="57.42" radius="21.3825" width="30.11" />
+               </effect>
+            </ImageView>
+            <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="185.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="card1" fitHeight="181.0" fitWidth="108.0" layoutX="8.0" layoutY="2.0" onDragDetected="#dragDetected" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../pics/wizard.png" />
-               </image></ImageView>
-            <ImageView fx:id="card3" fitHeight="172.0" fitWidth="140.0" layoutX="10.0" layoutY="182.0" pickOnBounds="true" preserveRatio="true">
+               </image>
+            </ImageView>
+            <ImageView fx:id="card2" fitHeight="181.0" fitWidth="108.0" layoutX="8.0" layoutY="198.0" onDragDetected="#dragDetected" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../pics/valkyrie.png" />
-               </image></ImageView>
-            <ImageView fx:id="card4" fitHeight="172.0" fitWidth="110.0" layoutX="10.0" layoutY="354.0" pickOnBounds="true" preserveRatio="true">
+                  <Image url="@../pics/wizard.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="card3" fitHeight="181.0" fitWidth="108.0" layoutX="8.0" layoutY="395.0" onDragDetected="#dragDetected" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../pics/rage.png" />
-               </image></ImageView>
-            <Pane prefHeight="168.0">
-               <children>
-                  <ImageView fx:id="nextCard" fitHeight="122.0" fitWidth="90.0" layoutX="16.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../pics/pekka.png" />
-                     </image>
-                  </ImageView>
-                  <Label layoutX="20.0" layoutY="136.0" text="Next Card" />
-               </children>
-            </Pane>
-         </children>
-         <padding>
-            <Insets top="4.0" />
-         </padding>
-      </VBox>
-      <HBox>
-         <children>
-            <VBox alignment="TOP_CENTER">
-               <children>
-                  <ImageView fx:id="bar5" fitHeight="200.0" fitWidth="41.5" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../pics/barEmpty.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="bar4" fitHeight="200.0" fitWidth="41.5" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../pics/barEmpty.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="bar3" fitHeight="200.0" fitWidth="41.5" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../pics/barEmpty.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="bar2" fitHeight="200.0" fitWidth="41.5" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../pics/barEmpty.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="bar1" fitHeight="200.0" fitWidth="41.5" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../pics/barEmpty.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="150.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../pics/elixir.png" />
-                     </image>
-                  </ImageView>
-               </children>
-               <padding>
-                  <Insets top="4.0" />
-               </padding>
-            </VBox>
-            <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0">
+                  <Image url="@../pics/wizard.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="card4" fitHeight="181.0" fitWidth="108.0" layoutX="8.0" layoutY="593.0" onDragDetected="#dragDetected" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../pics/wizard.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="nextCard" fitHeight="111.0" fitWidth="60.0" layoutX="13.0" layoutY="791.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../pics/pekka.png" />
+               </image>
+            </ImageView>
+            <VBox alignment="TOP_CENTER" layoutX="120.0">
                <children>
                   <ImageView fx:id="bar10" fitHeight="200.0" fitWidth="41.5" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -4664,6 +4646,31 @@
                         <Image url="@../pics/barEmpty.png" />
                      </image>
                   </ImageView>
+                  <ImageView fx:id="bar5" fitHeight="200.0" fitWidth="41.5" layoutX="10.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../pics/barEmpty.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="bar4" fitHeight="200.0" fitWidth="41.5" layoutX="10.0" layoutY="444.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../pics/barEmpty.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="bar3" fitHeight="200.0" fitWidth="41.5" layoutX="10.0" layoutY="566.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../pics/barEmpty.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="bar2" fitHeight="200.0" fitWidth="41.5" layoutX="10.0" layoutY="652.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../pics/barEmpty.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="bar1" fitHeight="200.0" fitWidth="41.5" layoutX="10.0" layoutY="738.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../pics/barEmpty.png" />
+                     </image>
+                  </ImageView>
                   <ImageView fitHeight="150.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../pics/elixir.png" />
@@ -4674,10 +4681,23 @@
                   <Insets top="4.0" />
                </padding>
             </VBox>
+            <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="382.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="579.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+               </image>
+            </ImageView>
+            <Label layoutX="61.0" layoutY="832.0" rotate="270.0" text="Next Card" textFill="#f2eded" />
+            <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="778.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+               </image>
+            </ImageView>
          </children>
-      </HBox>
+      </Pane>
    </children>
-   <padding>
-      <Insets right="5.0" />
-   </padding>
 </HBox>

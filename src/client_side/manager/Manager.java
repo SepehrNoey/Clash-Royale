@@ -6,13 +6,6 @@ import client_side.view.Render;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import shared.enums.BoardTypes;
 import shared.model.Message;
 import shared.model.Task;
@@ -55,7 +48,7 @@ public class Manager {
 
     public void start(){
         scene.setRoot(gameRoot);
-        Starter.stage.setWidth(832);
+        Starter.stage.setWidth(790);
 
         // for bot mode
         try {

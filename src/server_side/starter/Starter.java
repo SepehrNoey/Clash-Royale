@@ -87,7 +87,7 @@ public class Starter {
                 firstPlayer.getSender().sendMsg(new Message(MessageType.DATA , "Server" , firstPlayer.getName() + ","
                         + firstPlayer.getLevel() + "," + firstPlayer.getXp() + "," + firstPlayer.getPassword() + "," + cards));
                 players.add(firstPlayer);
-                MsgSeparator msgSeparator = new MsgSeparator(firstPlayer.getSharedInbox(), gameModeMsg ,joinGameMsg , inGameInbox); // from now all messages are got from Getter!!
+                MsgSeparator msgSeparator = new MsgSeparator(firstPlayer,firstPlayer.getSharedInbox(), gameModeMsg ,joinGameMsg , inGameInbox); // from now all messages are got from Getter!!
                 executor.execute(firstPlayer.getGetter());
                 executor.execute(msgSeparator);
                 break; // now going for other players(if exist)
@@ -121,7 +121,7 @@ public class Starter {
         {
             Bot bot = gameMode.getContent().equals("bot1") ? new BotLevel1(inGameInbox , incomingEventsForBots , players.get(0).getLevel()) : gameMode.getContent().equals("bot2")
                     ? new BotLevel2(inGameInbox , incomingEventsForBots , players.get(0).getLevel()) : new BotLevel3(inGameInbox , incomingEventsForBots , players.get(0).getLevel());
-            GameLoop gameLoop = new GameLoop(gameMode.getContent(),players , bot , inGameInbox,incomingEventsForBots , executor);
+            GameLoop gameLoop = new GameLoop(gameMode.getContent(), players , bot , inGameInbox,incomingEventsForBots , executor);
             gameLoop.play();
         }
         else { // waiting for one or three players
@@ -155,7 +155,7 @@ public class Starter {
                                 cards += player.getCards().get(j).getType().toString() + ",";
                             player.getSender().sendMsg(new Message(MessageType.DATA , "Server" , player.getName() + ","
                                     + player.getLevel() + "," + player.getXp() + "," + player.getPassword() + "," + cards));
-                            MsgSeparator msgSeparator = new MsgSeparator(player.getSharedInbox(), gameModeMsg, joinGameMsg, inGameInbox); // from now all messages are got from Getter!!
+                            MsgSeparator msgSeparator = new MsgSeparator(player,player.getSharedInbox(), gameModeMsg, joinGameMsg, inGameInbox); // from now all messages are got from Getter!!
                             executor.execute(player.getGetter());
                             executor.execute(msgSeparator);
 
@@ -189,20 +189,20 @@ public class Starter {
                     }
                 }
             }
-            GameLoop gameLoop = new GameLoop(gameMode.getContent(),players , null , inGameInbox, incomingEventsForBots , executor); // here should change for more game kinds (like bot + bot + human + human)
+            GameLoop gameLoop = new GameLoop(gameMode.getContent(), players , null , inGameInbox, incomingEventsForBots , executor); // here should change for more game kinds (like bot + bot + human + human)
             gameLoop.play();
         }
     }
     public static Player signupOrLogin(String singOrLog , Message req,Socket socket , ObjectInputStream inObj
             , ObjectOutputStream outObj , DBUtil dbUtil){ // because player is created in this method , we need these parameters
 
-            Player player = null;
-            if (singOrLog.equals("signup"))
-                player = dbUtil.register(req.getSender(), req.getContent(),socket,outObj,inObj);
-            else
-                player = dbUtil.getPlayer(req.getSender(), req.getContent(),socket,outObj,inObj);
+        Player player = null;
+        if (singOrLog.equals("signup"))
+            player = dbUtil.register(req.getSender(), req.getContent(),socket,outObj,inObj);
+        else
+            player = dbUtil.getPlayer(req.getSender(), req.getContent(),socket,outObj,inObj);
 
-            return player; // if player didn't created - null is returned
+        return player; // if player didn't created - null is returned
     }
 
 }

@@ -2,11 +2,12 @@ package client_side.controller;
 
 import client_side.manager.Manager;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 
 public class GameSceneController {
 
@@ -24,7 +25,6 @@ public class GameSceneController {
     @FXML private ImageView downBigWeaponHead;
     @FXML private ImageView downRightWeaponBase;
     @FXML private ImageView downRightWeaponHead;
-    @FXML private VBox vBox;
     @FXML private ImageView card1;
     @FXML private ImageView card2;
     @FXML private ImageView card3;
@@ -126,9 +126,6 @@ public class GameSceneController {
         return downRightWeaponHead;
     }
 
-    public VBox getvBox() {
-        return vBox;
-    }
 
     public ImageView getBar1() {
         return bar1;
@@ -181,6 +178,44 @@ public class GameSceneController {
     public Manager getManager() {
         return manager;
     }
+
+
+    @FXML
+    void dragDetected(MouseEvent event) {
+        Dragboard db = card1.startDragAndDrop(TransferMode.COPY);
+        System.out.println("drag detected.");
+
+        ClipboardContent cb = new ClipboardContent();
+        System.out.println(event.getSource().toString());
+        cb.putString(event.getSource().toString());
+
+
+        db.setContent(cb);
+        event.consume();
+    }
+
+    @FXML
+    void handleDragOver(DragEvent event) {
+        if (event.getDragboard().hasString() || event.getDragboard().hasFiles())
+        {
+            System.out.println("had string");
+            event.acceptTransferModes(TransferMode.COPY);
+        }
+    }
+
+    @FXML
+    void handleDragDropped(DragEvent event) {
+        System.out.println("dropped");
+        String str = event.getDragboard().getString();
+        System.out.println(str);
+    }
+
+    @FXML
+    void done(DragEvent event) {
+
+        System.out.println("Done");
+    }
+
 }
 
 

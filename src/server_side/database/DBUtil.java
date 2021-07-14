@@ -19,7 +19,7 @@ public class DBUtil {
     public DBUtil() {
         try {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/Clash Royale"
-                    ,"root","Sepehr0150188511"); // may have bug here because of password
+                    ,"root","Sepehr0150188511");
             statement = connection.createStatement();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -70,7 +70,7 @@ public class DBUtil {
             sb.setLength(0);
             sb.append("CREATE TABLE ");
             sb.append(tableName);
-            sb.append("(`type` VARCHAR(255), `level` INT , PRIMARY KEY(`type`))");
+            sb.append("(`index` INT AUTO_INCREMENT,`type` VARCHAR(255), `level` INT , PRIMARY KEY(`index`))");
 
             ArrayList<Card> cards = new ArrayList<>();
             Card card;
@@ -106,5 +106,67 @@ public class DBUtil {
         return null;
     }
 
+
+    public String getHistory(Player player)
+    {
+        String tableName = player.getName()+"_history";
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM ");
+        sb.append(tableName);
+        StringBuilder history = new StringBuilder();
+        try {
+            ResultSet resultSet = statement.executeQuery(sb.toString());
+            while (resultSet.next())
+            {
+                history.append(resultSet.getString("opponent"));
+                history.append(" ");
+                history.append(resultSet.getString("winner"));
+                history.append(" ");
+            }
+            return history.toString();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return "";
+    }
+
+    public void UpdateCards(Player player)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("DROP TABLE ");sb.append(player.getName());sb.append("_cards");
+        try {
+            statement.executeUpdate(sb.toString());
+
+            Statement cardStmnt = connection.createStatement();
+
+            String tableName = player.getName()+"_cards";
+            sb.setLength(0);
+            sb.append("CREATE TABLE ");
+            sb.append(tableName);
+            sb.append("(`index` INT AUTO_INCREMENT,`type` VARCHAR(255), `level` INT , PRIMARY KEY(`index`))");
+            cardStmnt.executeUpdate(sb.toString());
+
+            for(Card card : player.getDeck())
+            {
+                sb.setLength(0);
+                sb.append("'");sb.append(card.getType().toString());sb.append("'");
+                cardStmnt.executeUpdate("INSERT INTO "+tableName+" (`type`,`level`) VALUES" +
+                        " ("+sb.toString()+","+card.getLevel()+")");
+            }
+            for(int i=8;i<12;i++)
+            {
+                Card card = player.getCards().get(i);
+                sb.setLength(0);
+                sb.append("'");sb.append(card.getType().toString());sb.append("'");
+                cardStmnt.executeUpdate("INSERT INTO "+tableName+" (`type`,`level`) VALUES" +
+                        " ("+sb.toString()+","+card.getLevel()+")");
+            }
+
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
 
 }

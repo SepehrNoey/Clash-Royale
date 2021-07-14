@@ -1,5 +1,6 @@
 package server_side.starter;
 
+import server_side.database.DBUtil;
 import shared.model.Message;
 import shared.enums.MessageType;
 import shared.model.player.Player;
@@ -8,12 +9,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 
 public class MsgSeparator implements Runnable{
+    private Player player;
     private ArrayBlockingQueue<Message> sharedInbox;
     private ArrayBlockingQueue<Message> inGameInbox;
     private LinkedTransferQueue<Message> gameModeMsg;
     private LinkedTransferQueue<Message> joinGameMsg;
 
-    public MsgSeparator(ArrayBlockingQueue<Message> sharedInbox ,LinkedTransferQueue<Message> gameModeMsg ,LinkedTransferQueue<Message> joinGameMsg ,ArrayBlockingQueue<Message> inGameInbox ){
+    public MsgSeparator(Player player,ArrayBlockingQueue<Message> sharedInbox , LinkedTransferQueue<Message> gameModeMsg , LinkedTransferQueue<Message> joinGameMsg , ArrayBlockingQueue<Message> inGameInbox ){
+        this.player = player;
         this.sharedInbox = sharedInbox;
         this.inGameInbox = inGameInbox;
         this.gameModeMsg = gameModeMsg;
@@ -42,6 +45,10 @@ public class MsgSeparator implements Runnable{
             else if(msg.getType() == MessageType.BATTLE_HISTORY)
             {
                 // database work
+                DBUtil dbUtil = new DBUtil();
+                Message history = new Message(MessageType.BATTLE_HISTORY,"Server",dbUtil.getHistory(player));
+                player.getSender().sendMsg(history);
+
             }
             else if (msg.getType() == MessageType.GAME_MODE)
             {
