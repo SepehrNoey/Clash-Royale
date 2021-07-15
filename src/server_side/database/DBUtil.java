@@ -19,7 +19,7 @@ public class DBUtil {
     public DBUtil() {
         try {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/Clash Royale"
-                    ,"root","Sepehr0150188511");
+                    ,"root","");
             statement = connection.createStatement();
         } catch (SQLException throwables) {
             throwables.printStackTrace();

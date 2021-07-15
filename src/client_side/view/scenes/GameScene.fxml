@@ -4591,7 +4591,7 @@
             </ImageView>
             <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="185.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+                  <Image url="@../pics/lightwood.jpg" />
                </image>
             </ImageView>
             <ImageView fx:id="card1" fitHeight="181.0" fitWidth="108.0" layoutX="8.0" layoutY="2.0" onDragDetected="#dragDetected" pickOnBounds="true" preserveRatio="true">
@@ -4683,18 +4683,18 @@
             </VBox>
             <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="382.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+                  <Image url="@../pics/lightwood.jpg" />
                </image>
             </ImageView>
             <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="579.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+                  <Image url="@../pics/lightwood.jpg" />
                </image>
             </ImageView>
             <Label layoutX="61.0" layoutY="832.0" rotate="270.0" text="Next Card" textFill="#f2eded" />
             <ImageView fitHeight="16.0" fitWidth="115.0" layoutX="3.0" layoutY="778.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../Downloads/lightwood.jpg" />
+                  <Image url="@../pics/lightwood.jpg" />
                </image>
             </ImageView>
          </children>
