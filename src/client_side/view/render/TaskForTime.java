@@ -1,12 +1,12 @@
-package shared.model;
+package client_side.view.render;
 
 import javafx.application.Platform;
 
 import java.util.TimerTask;
 
-public class Task extends TimerTask {
+public class TaskForTime extends TimerTask {
     private TimeUpdater updater;
-    public Task(TimeUpdater updater)
+    public TaskForTime(TimeUpdater updater)
     {
         this.updater = updater;
     }

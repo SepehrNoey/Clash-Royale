@@ -2,9 +2,9 @@ package shared.model;
 
 import shared.enums.BoardThings;
 import shared.enums.BoardTypes;
-import shared.enums.TowerTypes;
-import shared.model.troops.Tower;
+import shared.enums.CardTypes;
 import shared.model.troops.Troop;
+import shared.model.troops.card.Card;
 
 import java.util.ArrayList;
 
@@ -13,10 +13,13 @@ public class Board {
     private BoardTypes type;
     private ArrayList<Troop> addedTroops;
     private boolean isServerSide;
+    private boolean isLeftUpAreaAllowed;
+    private boolean isRightUpAreaAllowed;
 
     public Board(BoardTypes type , boolean isServerSide , String humanPlayer){
         this.type = type;
         board = new BoardThings[21][30];
+        addedTroops = new ArrayList<>();
         this.isServerSide = isServerSide;
         makeRawBoard();
     }
@@ -29,40 +32,32 @@ public class Board {
             for (int i = 3 ; i < 6 ; i++) // index in board starts from zero!!!
                 for (int j = 3 ; j < 27 ; j++)
                     board[i][j] = BoardThings.ROAD;
-            board[3][14] = BoardThings.WATER;
-            board[3][15] = BoardThings.WATER;
-            board[4][14] = BoardThings.BRIDGE;
-            board[4][15] = BoardThings.BRIDGE;
-            board[5][14] = BoardThings.WATER;
-            board[5][15] = BoardThings.WATER;
-
             for (int i = 14 ; i < 17 ; i++)
                 for (int j = 3 ; j < 27 ; j++)
                     board[i][j] = BoardThings.ROAD;
-            board[14][14] = BoardThings.WATER;
-            board[14][15] = BoardThings.WATER;
-            board[15][14] = BoardThings.BRIDGE;
-            board[15][15] = BoardThings.BRIDGE;
-            board[16][14] = BoardThings.WATER;
-            board[16][15] = BoardThings.WATER;
-
             for (int i = 6 ; i < 15 ; i++)
                 for (int j = 3 ; j < 5 ; j++)
+                    board[i][j] = BoardThings.ROAD;
+            for (int i = 6 ; i < 15 ; i++)
+                for (int j = 24 ; j < 26 ; j++)
                     board[i][j] = BoardThings.ROAD;
 
             board[9][2] = BoardThings.ROAD;
             board[10][2] = BoardThings.ROAD;
             board[11][2] = BoardThings.ROAD;
-
-
-            for (int i = 6 ; i < 15 ; i++)
-                for (int j = 24 ; j < 26 ; j++)
-                    board[i][j] = BoardThings.ROAD;
-
             board[9][26] = BoardThings.ROAD;
             board[10][26] = BoardThings.ROAD;
             board[11][26] = BoardThings.ROAD;
 
+            // road
+            for (int j = 14 ; j < 16 ; j++)
+                for (int i = 0 ; i < 21 ; i++)
+                    board[i][j] = BoardThings.WATER;
+            // bridges
+            board[4][14] = BoardThings.BRIDGE;
+            board[4][15] = BoardThings.BRIDGE;
+            board[15][14] = BoardThings.BRIDGE;
+            board[15][15] = BoardThings.BRIDGE;
 
             // objects
             board[0][6] = BoardThings.OBJECT;
@@ -132,4 +127,33 @@ public class Board {
     public BoardTypes getType() {
         return type;
     }
+
+    public boolean isValidAddress(Card chosen, double x , double y){
+        int tileX = (int)Math.round(x);
+        int tileY = (int)Math.round(y);
+        tileX--; // changing to array index
+        tileY--;
+        if (tileX >= 21 || tileY >= 30) // out of map
+            return false;
+        if (chosen.getType() == CardTypes.ARROWS || chosen.getType() == CardTypes.FIREBALL // spells are allowed everywhere
+                || chosen.getType() == CardTypes.RAGE)
+            return true;
+        else if ((tileX >= 8 && tileX <= 10 && tileY <= 26 && tileY >= 24) || (   // for soldiers and buildings
+        tileX >= 3 && tileX <= 5 && tileY >= 23 && tileY <= 25) || (tileX >= 14 && tileX <= 16 && tileY >= 23 && tileY <= 25))
+            return false;
+
+        else if (tileY >= 16 && !(board[tileX][tileY] == BoardThings.OBJECT))
+            return true;
+        else if (tileY <= 15 && tileY >= 10 && !(board[tileX][tileY] == BoardThings.OBJECT || board[tileX][tileY] == BoardThings.WATER))
+        {
+            if (tileX <= 10 && isLeftUpAreaAllowed)
+                return true;
+            if (tileX >= 10 &&  isRightUpAreaAllowed)
+                return true;
+            return false;
+        }
+        else return false;
+    }
+
+
 }

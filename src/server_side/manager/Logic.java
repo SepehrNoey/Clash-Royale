@@ -35,7 +35,12 @@ public class Logic implements Runnable {
     }
 
     public void addToCheckEvent(Message newEvent){
-        toCheckEvents.add(newEvent);
+        try {
+            toCheckEvents.put(newEvent);
+        }catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -48,6 +53,7 @@ public class Logic implements Runnable {
             {
                 try {
                     event = toCheckEvents.take();
+                    this.handle(event);
                 }catch (InterruptedException e)
                 {
                     System.out.println("Interrupted in getting new event in logic (toCheckEvents). Shouldn't happen. Error!");
@@ -57,6 +63,12 @@ public class Logic implements Runnable {
 
 
         }
+    }
+
+    public void handle(Message event){
+        // calculate where to go and in how much time
+
+
     }
 
 

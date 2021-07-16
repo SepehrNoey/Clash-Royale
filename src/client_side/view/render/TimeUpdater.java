@@ -1,4 +1,4 @@
-package shared.model;
+package client_side.view.render;
 
 import javafx.scene.control.Label;
 

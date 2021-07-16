@@ -42,6 +42,8 @@ public class GameSceneController {
     @FXML private ImageView bar10;
     @FXML private Label enemyNameLabel;
     @FXML private Label timeLabel;
+    @FXML private Pane cardPane;
+    @FXML private Pane barsPane;
 
     private Manager manager;
 
@@ -179,41 +181,46 @@ public class GameSceneController {
         return manager;
     }
 
+    public Pane getBarsPane() {
+        return barsPane;
+    }
 
     @FXML
     void dragDetected(MouseEvent event) {
-        Dragboard db = card1.startDragAndDrop(TransferMode.COPY);
-        System.out.println("drag detected.");
-
+        Dragboard db = cardPane.startDragAndDrop(TransferMode.ANY);
         ClipboardContent cb = new ClipboardContent();
-        System.out.println(event.getSource().toString());
-        cb.putString(event.getSource().toString());
-
-
+        cb.putString(getCard(event));
         db.setContent(cb);
         event.consume();
     }
 
     @FXML
     void handleDragOver(DragEvent event) {
-        if (event.getDragboard().hasString() || event.getDragboard().hasFiles())
+        if (event.getDragboard().hasString())
         {
-            System.out.println("had string");
-            event.acceptTransferModes(TransferMode.COPY);
+            event.acceptTransferModes(TransferMode.ANY);
         }
     }
 
     @FXML
     void handleDragDropped(DragEvent event) {
-        System.out.println("dropped");
-        String str = event.getDragboard().getString();
-        System.out.println(str);
+        manager.cardDroppingReq(event.getDragboard().getString(),event.getSceneX(),event.getSceneY());
     }
 
     @FXML
     void done(DragEvent event) {
 
         System.out.println("Done");
+    }
+
+    private String getCard(MouseEvent event){
+        if (event.getSource().toString().contains("card1"))
+            return "card1";
+        else if (event.getSource().toString().contains("card2"))
+            return "card2";
+        else if (event.getSource().toString().contains("card3"))
+            return "card3";
+        else return "card4";
     }
 
 }
