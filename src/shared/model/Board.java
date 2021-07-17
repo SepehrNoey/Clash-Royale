@@ -5,6 +5,7 @@ import shared.enums.BoardThings;
 import shared.enums.BoardTypes;
 import shared.enums.CardTypes;
 import shared.enums.TowerTypes;
+import shared.model.troops.Tower;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 
@@ -47,22 +48,22 @@ public class Board implements Runnable {
             for (int i = 3 ; i < 6 ; i++) // index in board starts from zero!!!
                 for (int j = 3 ; j < 27 ; j++)
                     board[i][j] = BoardThings.ROAD;
-            for (int i = 14 ; i < 17 ; i++)
+            for (int i = 15 ; i < 18 ; i++)
                 for (int j = 3 ; j < 27 ; j++)
                     board[i][j] = BoardThings.ROAD;
-            for (int i = 6 ; i < 15 ; i++)
+            for (int i = 6 ; i < 16 ; i++)
                 for (int j = 3 ; j < 5 ; j++)
                     board[i][j] = BoardThings.ROAD;
-            for (int i = 6 ; i < 15 ; i++)
+            for (int i = 6 ; i < 16 ; i++)
                 for (int j = 24 ; j < 26 ; j++)
                     board[i][j] = BoardThings.ROAD;
 
             board[9][2] = BoardThings.ROAD;
             board[10][2] = BoardThings.ROAD;
             board[11][2] = BoardThings.ROAD;
-            board[9][26] = BoardThings.ROAD;
-            board[10][26] = BoardThings.ROAD;
-            board[11][26] = BoardThings.ROAD;
+            board[9][27] = BoardThings.ROAD;
+            board[10][27] = BoardThings.ROAD;
+            board[11][27] = BoardThings.ROAD;
 
             // road
             for (int j = 14 ; j < 16 ; j++)
@@ -71,8 +72,8 @@ public class Board implements Runnable {
             // bridges
             board[4][14] = BoardThings.BRIDGE;
             board[4][15] = BoardThings.BRIDGE;
-            board[15][14] = BoardThings.BRIDGE;
-            board[15][15] = BoardThings.BRIDGE;
+            board[16][14] = BoardThings.BRIDGE;
+            board[16][15] = BoardThings.BRIDGE;
 
             // objects
             board[0][6] = BoardThings.OBJECT;
@@ -192,7 +193,6 @@ public class Board implements Runnable {
         }
     }
 
-
     public Troop getNearestEnemy(int x , int y){
         int xMin = 0;
         int yMin = 0;
@@ -244,12 +244,79 @@ public class Board implements Runnable {
     }
 
     public void updateAllTimers(Card changedCard){ // the card which its coordinates are updated
-        
+        for (Troop troop:addedTroops)
+        {
+
+        }
+    }
+
+    public Card isEnemyAround(int x , int y){ // towers are ignored!!!
+        for (Troop troop:addedTroops)  // checking a circle with radius sqrt(72)
+        {
+            if (Math.pow(x - troop.getCoordinates().getX() , 2) + Math.pow(y - troop.getCoordinates().getY() , 2) <= 72
+        && !(troop instanceof Tower ))
+            {
+                return (Card) troop;
+            }
+        }
+        return null;
     }
 
 
 
-    //    public String getWay(){
-//
+
+    public String getNearestWay(Card card,int x , int y){ // this method gives second destination (when character wants to go to road)
+        if (card.getOwner().contains("bot") && y == 25)
+        {
+            if (x <= 10)
+                return "right";
+            else
+                return "left";
+        }
+        else if (!card.getOwner().contains("bot") && y == 4)
+        {
+            if (x <= 10)
+                return "right";
+            else
+                return "left";
+        }
+        else if ((board[x][y] == BoardThings.ROAD || board[x][y] == BoardThings.BRIDGE) &&
+                (board[x][y - 1] == BoardThings.ROAD || board[x][y -1] == BoardThings.BRIDGE))
+        {
+            if (!card.getOwner().contains("bot"))
+                return "down";
+            else
+                return "up";
+        }
+        else if (x < 3)
+            return "right";
+        else if (x > 3 && x <= 10)
+            return "left";
+        else if (x >= 10 && x <= 14)
+            return "right";
+        else if (x >= 18)
+            return "left";
+        return null;
+    }
+
+    /**
+     * getter for troopTimers
+     * @return troopTimers
+     */
+    public HashMap<Troop, Timer> getTroopsTimer() {
+        return troopsTimer;
+    }
+
+    /**
+     * getter
+     * @return CoordinateUpdateQueue
+     */
+    public LinkedTransferQueue<Card> getCoordinateUpdateQueue() {
+        return coordinateUpdateQueue;
+    }
+
+//    public String makeSlope(Point2D start , Point2D destination){
+//        if (start.getX() == )
 //    }
+
 }

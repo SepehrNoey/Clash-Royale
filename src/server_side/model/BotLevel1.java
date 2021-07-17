@@ -7,7 +7,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class BotLevel1 extends Bot implements Runnable{
     public BotLevel1(ArrayBlockingQueue<Message> inGameInbox , ArrayBlockingQueue<Message> incomingEvents , int level){
         super(inGameInbox , incomingEvents , level);
-        setName("Bot 1");
+        setName("bot1");
     }
 
     @Override

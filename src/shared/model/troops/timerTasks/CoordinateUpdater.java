@@ -2,22 +2,35 @@ package shared.model.troops.timerTasks;
 
 import shared.model.troops.card.Card;
 import java.util.TimerTask;
+import java.util.concurrent.LinkedTransferQueue;
 
 public class CoordinateUpdater extends TimerTask {
     private Card card;
     private String slope;
     private int xToChange;
     private int yToChange;
+    private LinkedTransferQueue<Card> coordinateUpdateQueue;
 
-    public CoordinateUpdater(Card card ,String slope) {
+    public CoordinateUpdater(Card card ,String slope ,LinkedTransferQueue<Card> coordinateUpdateQueue) {
         this.card = card;
         this.slope = slope;
+        this.coordinateUpdateQueue = coordinateUpdateQueue;
         setXYChange();
     }
 
     @Override
     public void run() {
-        card.setCoordinates(card.getCoordinates().add(xToChange ,yToChange));
+        synchronized (this)
+        {
+            card.setCoordinates(card.getCoordinates().add(xToChange ,yToChange));
+            try {
+                coordinateUpdateQueue.transfer(card);
+            }catch (InterruptedException e)
+            {
+                System.out.println("interrupted in putting updating coordinate queue.");
+                e.printStackTrace();
+            }
+        }
     }
 
     private void setXYChange(){

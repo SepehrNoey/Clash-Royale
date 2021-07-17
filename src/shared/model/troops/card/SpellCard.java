@@ -11,6 +11,7 @@ public class SpellCard extends Card{
     private int speedBoost;
     private int hitSpeedBoost;
     private boolean reducedDmg; // reduced damage to crown towers
+    private String direction; // will be used for rendering
 
     public SpellCard(boolean isServerSide,CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                      int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates,
@@ -63,5 +64,21 @@ public class SpellCard extends Card{
      */
     public boolean isReducedDmg() {
         return reducedDmg;
+    }
+
+    /**
+     * getter
+     * @return direction of going
+     */
+    public String getDirection() {
+        return direction;
+    }
+
+    /**
+     * setter
+     * @param direction the new direction(to go)
+     */
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 }

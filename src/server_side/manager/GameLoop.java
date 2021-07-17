@@ -25,7 +25,7 @@ public class GameLoop {
         if (bot != null)
             this.bot = bot;
         this.inGameInbox = inGameInbox;
-        logic = new Logic(inGameInbox, new ArrayBlockingQueue<>(50) ,gameMode,players.get(0));
+        logic = new Logic(inGameInbox, new ArrayBlockingQueue<>(50) ,gameMode,players.get(0) , bot);
         this.executor = executor;
         this.incomingEventsForBots = incomingEventsForBots;
     }

@@ -59,4 +59,8 @@ public abstract class Bot implements Runnable{
     public String getName() {
         return name;
     }
+
+    public ArrayList<Card> getDeck() {
+        return deck;
+    }
 }

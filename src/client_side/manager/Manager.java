@@ -131,6 +131,7 @@ public class Manager {
         // valid choosing
 
         player.getSender().sendMsg(new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType() + "," + tileX + "," + tileY));
+        chosen.setCoordinates(new Point2D(tileX , tileY));
         // + updating elixir bar
         render.addForRender(chosen);
 
@@ -141,13 +142,16 @@ public class Manager {
 
 
     public Card getCardByStr(String str){
-        return switch (str) {
-            case "card1" -> card1;
-            case "card2" -> card2;
-            case "card3" -> card3;
-            case "card4" -> card4;
-            default -> null;
-        };
+        if (str.equals("card1"))
+            return card1;
+        else if (str.equals("card2"))
+            return card2;
+        else if (str.equals("card3"))
+            return card3;
+        else if (str.equals("card4"))
+            return card4;
+
+        return null;
     }
 
 
