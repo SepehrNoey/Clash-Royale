@@ -25,7 +25,7 @@ public class GameLoop {
         if (bot != null)
             this.bot = bot;
         this.inGameInbox = inGameInbox;
-        logic = new Logic(inGameInbox, new ArrayBlockingQueue<>(50));
+        logic = new Logic(inGameInbox, new ArrayBlockingQueue<>(50) ,gameMode,players.get(0));
         this.executor = executor;
         this.incomingEventsForBots = incomingEventsForBots;
     }
@@ -33,13 +33,6 @@ public class GameLoop {
     public void play(){
         executor.execute(logic);
         Message event = null;
-//        String playersLevels = ""; // attention ! this is just implemented for total two players !!!
-//        for (Player player: players) // have to change for more players
-//            playersLevels += player.getName() + "_" + "Lvl " + player.getLevel();
-//        for (Player player: players) // just sending for humans - data of other players
-//        {
-//            player.getSender().sendMsg(new Message(MessageType.DATA , "Server",playersLevels));
-//        }
         for (Player player: players)
         {
             player.getSender().sendMsg(new Message(MessageType.DATA , "Server" , bot.getName() + "," + bot.getLevel())); // just implemented for bot!!!

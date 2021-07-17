@@ -103,16 +103,22 @@ public abstract class Troop {
     }
 
     /**
+     * getter
+     * @return owner name
+     */
+    public String getOwner() {
+        return owner;
+    }
+
+    /**
      * factory method for troops
      * @param type of troop as a string
      * @param level of troop
      * @param point2D of troop (can be null)
      * @param owner owner of troop
-     * @param base is used just when we want to make tower(can be null)
-     * @param head is used just when we want to make tower(can be null)
      * @return a created Troop
      */
-    public static Troop makeTroop(boolean isServerSide,String type , int level , Point2D point2D , String owner , ImageView base , ImageView head){
+    public static Troop makeTroop(boolean isServerSide,String type , int level , Point2D point2D , String owner){
         CardTypes typeParam  = null;
         TowerTypes towerType = null;
         if (type.equals(TowerTypes.PRINCESS_TOWER.toString()) || type.equals(TowerTypes.KING_TOWER.toString()))
@@ -210,16 +216,24 @@ public abstract class Troop {
         {
             return new Tower(isServerSide,level == 1 ? 50 : level == 2 ? 53 : level == 3 ? 57 : level == 4 ? 60 : 64 ,
                     level , "client_side/view/pics/kingTowerHead" , 1 , 90 , 90 ,7 ,TargetTypes.GROUND ,
-                    TowerTypes.KING_TOWER , level == 1 ? 2400 : level == 2 ? 2568 : level == 3 ? 2736 : level == 4 ? 2904 : 3096 ,1,base,head,point2D,owner);
+                    TowerTypes.KING_TOWER , level == 1 ? 2400 : level == 2 ? 2568 : level == 3 ? 2736 : level == 4 ? 2904 : 3096 ,1,point2D,owner);
         }
         else if (towerType == TowerTypes.PRINCESS_TOWER)
         {
             return new Tower(isServerSide,level == 1 ? 50 : level == 2 ? 54 : level == 3 ? 58 : level == 4 ? 62 : 69 ,
                     level , "client_side/view/pics/princessTowerHead" , 1 , 90 , 90 ,7.5 ,TargetTypes.AIR_GROUND ,
-                    TowerTypes.PRINCESS_TOWER , level == 1 ? 1400 : level == 2 ? 1512 : level == 3 ? 1624 : level == 4 ? 1750 : 1890 ,0.8,base,head,point2D,owner);
+                    TowerTypes.PRINCESS_TOWER , level == 1 ? 1400 : level == 2 ? 1512 : level == 3 ? 1624 : level == 4 ? 1750 : 1890 ,0.8,point2D,owner);
         }
         else {
             return null;
         }
+    }
+
+    /**
+     * setter
+     * @param coordinates the new coordinates
+     */
+    public void setCoordinates(Point2D coordinates) {
+        this.coordinates = coordinates;
     }
 }

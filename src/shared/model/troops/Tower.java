@@ -9,19 +9,15 @@ public class Tower extends Troop{
     private TowerTypes type;
     private int hp;
     private double hitSpeed;
-    private ImageView base;
-    private ImageView head;
 
     public Tower(boolean isServerSide,int damage, int level, String attackFrmPath, int attackFrmNum, int width,
                  int height, double range, TargetTypes target, TowerTypes type, int hp,
-                 double hitSpeed, ImageView base, ImageView head , Point2D coordinates , String owner)
+                 double hitSpeed, Point2D coordinates , String owner)
     {
         super(isServerSide, damage, level, attackFrmPath, attackFrmNum, width, height, range, target ,coordinates , owner);
         this.type = type;
         this.hp = hp;
         this.hitSpeed = hitSpeed;
-        this.base = base;
-        this.head = head;
     }
 
     /**
@@ -46,21 +42,5 @@ public class Tower extends Troop{
      */
     public double getHitSpeed() {
         return hitSpeed;
-    }
-
-    /**
-     * getter
-     * @return base ImageView
-     */
-    public ImageView getBase() {
-        return base;
-    }
-
-    /**
-     * getter
-     * @return head ImageView
-     */
-    public ImageView getHead() {
-        return head;
     }
 }

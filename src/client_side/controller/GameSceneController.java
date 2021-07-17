@@ -204,7 +204,7 @@ public class GameSceneController {
 
     @FXML
     void handleDragDropped(DragEvent event) {
-        manager.cardDroppingReq(event.getDragboard().getString(),event.getSceneX(),event.getSceneY());
+        manager.cardDroppingReq(event.getDragboard().getString(),(int)Math.round(event.getSceneX() / 30.0) - 1,(int)Math.round(event.getSceneY() / 30.0) - 1);
         event.consume();
     }
 

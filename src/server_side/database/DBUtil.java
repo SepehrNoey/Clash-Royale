@@ -44,7 +44,7 @@ public class DBUtil {
                     {
                         cardsSet.next();
                         card = (Card) Troop.makeTroop(true,cardsSet.getString("type") , Integer.parseInt(resultSet.getString("level")) ,
-                                null,usr,null,null);
+                                null,usr);
                         cards.add(card);
                     }
                     return new Player(true,usr,password,Integer.parseInt(resultSet.getString("level")),Integer.parseInt(resultSet.getString("xp")),
@@ -86,7 +86,7 @@ public class DBUtil {
                 sb.append("'");sb.append(types.toString());sb.append("'");
                 cardSt.executeUpdate("INSERT INTO "+tableName+" (`type`,`level`) VALUES" +
                         " ("+sb.toString()+",1)");
-                card = (Card) Troop.makeTroop(true,types.toString() , 1 , null,usr , null,null);
+                card = (Card) Troop.makeTroop(true,types.toString() , 1 , null,usr);
                 cards.add(card);
             }
             tableName = usr+"_history";

@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import shared.enums.BoardTypes;
+import shared.enums.MessageType;
 import shared.enums.TowerTypes;
 import shared.model.Board;
 import shared.model.Message;
@@ -37,6 +38,7 @@ public class Manager {
     private Card card4;
     private ElixirUpdater elixirUpdater;
     private Timer elixirTimer;
+    private String botName;
 
     /**
      * constructor and initializer
@@ -44,8 +46,9 @@ public class Manager {
      * @param gameMode mode of game (1v1 , bot1 , ...)
      * @param scene scene of the game
      */
-    public Manager(Player player, String gameMode , Scene scene){
+    public Manager(Player player, String gameMode,String botName, Scene scene){
         this.scene = scene;
+        this.botName = botName;
         this.player = player;
         this.gameMode = gameMode;
         names_levels = new String[gameMode.equals("2v2") ? 3 : 1];
@@ -59,8 +62,8 @@ public class Manager {
         }
         sceneController = loader.getController(); // shouldn't be null !
         sceneController.setManager(this); // connecting manager and fxmlController
-        board = new Board(gameMode.equals("2v2") ? BoardTypes.FOUR_PLAYERS : BoardTypes.TWO_PLAYERS , false, player.getName());
-        addTowers(board.getType());
+        board = new Board(gameMode.equals("2v2") ? BoardTypes.FOUR_PLAYERS : BoardTypes.TWO_PLAYERS , false, player.getName() ,player.getLevel(), botName);
+        board.addTowers(board.getType() , player.getName());
         render = new Render(player.getName() , player.getSharedInbox(), board); // the only messages that will be sent to render must be inGameMessages!!!
         scene.setRoot(gameRoot);
         Starter.stage.setWidth(814);
@@ -88,7 +91,14 @@ public class Manager {
         TaskForElixir taskForElixir = new TaskForElixir(elixirUpdater);
         elixirUpdater.setItsTask(taskForElixir);
         elixirTimer.schedule(taskForElixir,0,27);
-
+        card1 = player.getDeck().get(0);
+        card2 = player.getDeck().get(1);
+        card3 = player.getDeck().get(2);
+        card4 = player.getDeck().get(3);
+        sceneController.getCard1().setImage(card1.getCardImage());
+        sceneController.getCard2().setImage(card2.getCardImage());
+        sceneController.getCard3().setImage(card3.getCardImage());
+        sceneController.getCard4().setImage(card4.getCardImage());
 
     }
 
@@ -111,18 +121,16 @@ public class Manager {
         return Integer.parseInt(split[1]);
     }
 
-    public void cardDroppingReq(String card , double x , double y){
-        elixirUpdater.decrease(5);
-
+    public void cardDroppingReq(String card , int tileX , int tileY){
         Card chosen = getCardByStr(card); // cards must be allocated before start!!! (4 first card in hand)
-        if (!board.isValidAddress(chosen,x,y))
+        if (!board.isValidAddress(chosen,tileX,tileY))
             return;
         if (chosen.getCost() > elixir) // is updated by gui
             return;
-
+        elixirUpdater.decrease(chosen.getCost());
         // valid choosing
 
-
+        player.getSender().sendMsg(new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType() + "," + tileX + "," + tileY));
         // + updating elixir bar
         render.addForRender(chosen);
 
@@ -142,31 +150,7 @@ public class Manager {
         };
     }
 
-    private void addTowers(BoardTypes boardType)
-    {
-        if (boardType == BoardTypes.TWO_PLAYERS)  // attention !! point2D is addressed by index  0 to MAX !!! - like Board
-        {
-            // player towers
-            board.addTroop(Troop.makeTroop(false,TowerTypes.KING_TOWER.toString() , player.getLevel() ,
-                    new Point2D(9,25) , player.getName(),sceneController.getDownBigWeaponBase() , sceneController.getDownBigWeaponHead()));
-            board.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , player.getLevel() ,
-                    new Point2D(4,24) , player.getName(),sceneController.getDownLeftWeaponBase() , sceneController.getDownLeftWeaponHead()));
-            board.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , player.getLevel() ,
-                    new Point2D(15,24) , player.getName(),sceneController.getDownRightWeaponBase() , sceneController.getDownRightWeaponHead()));
 
-            // enemy towers
-            board.addTroop(Troop.makeTroop(false,TowerTypes.KING_TOWER.toString() , player.getLevel() ,
-                    new Point2D(9,3) , gameMode,sceneController.getDownBigWeaponBase() , sceneController.getDownBigWeaponHead()));// attention : !! game mode is set for bot name
-            board.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , player.getLevel() ,
-                    new Point2D(4,4) , gameMode,sceneController.getDownLeftWeaponBase() , sceneController.getDownLeftWeaponHead()));
-            board.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , player.getLevel() ,
-                    new Point2D(15,4) , gameMode,sceneController.getDownRightWeaponBase() , sceneController.getDownRightWeaponHead()));
-
-        }
-        else {
-            // for four player board
-        }
-    }
 
     public void updateElixir(int elixir){
         this.elixir = elixir;

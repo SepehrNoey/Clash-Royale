@@ -33,7 +33,7 @@ public abstract class Bot implements Runnable{
         for (int i = 0 ; i < 8 ; i++) // making 8 random cards
         {
             int rand = random.nextInt(notUsed.size());
-            deck.add((Card) Troop.makeTroop(true,notUsed.get(rand).toString(), level,null,name,null , null)); // is name null ?
+            deck.add((Card) Troop.makeTroop(true,notUsed.get(rand).toString(), level,null,name)); // is name null ?
             notUsed.remove(rand);
         }
     }

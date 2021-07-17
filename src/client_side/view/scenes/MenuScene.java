@@ -554,7 +554,7 @@ public class MenuScene {
         });
         bot1.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot1"));
-            Manager manager = new Manager(player , "bot1",scene);
+            Manager manager = new Manager(player , "bot1","bot1",scene);
             manager.start();
         });
 
@@ -568,7 +568,7 @@ public class MenuScene {
         });
         bot2.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot2"));
-            Manager manager = new Manager(player , "bot2",scene);
+            Manager manager = new Manager(player , "bot2","bot2",scene);
             manager.start();
         });
 
@@ -581,7 +581,7 @@ public class MenuScene {
         });
         v1.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"1v1"));
-            Manager manager = new Manager(player , "1v1",scene);
+            Manager manager = new Manager(player , "1v1","1v1",scene);
             manager.start();
         });
 
@@ -594,7 +594,7 @@ public class MenuScene {
         });
         v2.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"2v2"));
-            Manager manager = new Manager(player , "2v2",scene);
+            Manager manager = new Manager(player , "2v2","2v2",scene);
             manager.start();
         });
 

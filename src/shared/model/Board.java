@@ -1,27 +1,42 @@
 package shared.model;
 
+import javafx.geometry.Point2D;
 import shared.enums.BoardThings;
 import shared.enums.BoardTypes;
 import shared.enums.CardTypes;
+import shared.enums.TowerTypes;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.concurrent.LinkedTransferQueue;
 
-public class Board {
+public class Board implements Runnable {
     private BoardThings[][] board;
     private BoardTypes type;
     private ArrayList<Troop> addedTroops;
     private boolean isServerSide;
     private boolean isLeftUpAreaAllowed;
     private boolean isRightUpAreaAllowed;
+    private String humanPlayer;
+    private String botName;
+    private int humanLevel;
+    private HashMap<Troop , Timer> troopsTimer;
+    private LinkedTransferQueue<Card> coordinateUpdateQueue;
 
-    public Board(BoardTypes type , boolean isServerSide , String humanPlayer){
+    public Board(BoardTypes type , boolean isServerSide , String humanPlayer , int humanLevel , String botName){
         this.type = type;
+        this.humanPlayer = humanPlayer;
+        this.humanLevel = humanLevel;
+        this.botName = botName;
         board = new BoardThings[21][30];
         addedTroops = new ArrayList<>();
         this.isServerSide = isServerSide;
         makeRawBoard();
+        troopsTimer = new HashMap<>();
+        coordinateUpdateQueue = new LinkedTransferQueue<>();
     }
 
 
@@ -128,11 +143,7 @@ public class Board {
         return type;
     }
 
-    public boolean isValidAddress(Card chosen, double x , double y){
-        int tileX = (int)Math.round(x);
-        int tileY = (int)Math.round(y);
-        tileX--; // changing to array index
-        tileY--;
+    public boolean isValidAddress(Card chosen, int tileX , int tileY){
         if (tileX >= 21 || tileY >= 30) // out of map
             return false;
         if (chosen.getType() == CardTypes.ARROWS || chosen.getType() == CardTypes.FIREBALL // spells are allowed everywhere
@@ -155,5 +166,90 @@ public class Board {
         else return false;
     }
 
+    public void addTowers(BoardTypes boardType , String playerName)
+    {
+        if (boardType == BoardTypes.TWO_PLAYERS)  // attention !! point2D is addressed by index  0 to MAX !!! - like Board
+        {
+            // player towers
+            this.addTroop(Troop.makeTroop(false, TowerTypes.KING_TOWER.toString() , humanLevel ,
+                    new Point2D(9,25) , playerName));
+            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(4,24) , playerName));
+            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(15,24) , playerName));
 
+            // bot towers
+            this.addTroop(Troop.makeTroop(false,TowerTypes.KING_TOWER.toString() , humanLevel ,
+                    new Point2D(9,3) , botName));// attention : !! game mode is set for bot name
+            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(4,4) , botName));
+            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(15,4) , botName));
+
+        }
+        else {
+            // for four player board
+        }
+    }
+
+
+    public Troop getNearestEnemy(int x , int y){
+        int xMin = 0;
+        int yMin = 0;
+        for (Troop troop:addedTroops)
+        {
+            if (!troop.getOwner().equals(humanPlayer))
+            {
+                xMin = (int)troop.getCoordinates().getX();
+                yMin = (int)troop.getCoordinates().getY();
+                break;
+            }
+        }
+        Troop nearest = null;
+
+        for (Troop troop:addedTroops)
+        {
+            int xEnemy = (int)troop.getCoordinates().getX();
+            int yEnemy = (int)troop.getCoordinates().getY();
+            if (!troop.getOwner().equals(humanPlayer))
+            {
+                if ( (Math.pow(x - xEnemy , 2) + Math.pow(y - yEnemy , 2 )) <= (Math.pow(x - xMin , 2) + Math.pow(y - yMin , 2 )))
+                {
+                    xMin = xEnemy;
+                    yMin = yEnemy;
+                    nearest = troop;
+                }
+            }
+        }
+        return nearest; // nearest enemy
+    }
+
+    @Override
+    public void run() {
+        Card updatedCard = null;
+        while (true) {
+            try {
+                updatedCard = coordinateUpdateQueue.take();
+            } catch (InterruptedException e)
+            {
+                System.out.println("Exception in getting updated coordinates.");
+                e.printStackTrace();
+            }
+            updateAllTimers(updatedCard);
+
+
+
+
+        }
+    }
+
+    public void updateAllTimers(Card changedCard){ // the card which its coordinates are updated
+        
+    }
+
+
+
+    //    public String getWay(){
+//
+//    }
 }
