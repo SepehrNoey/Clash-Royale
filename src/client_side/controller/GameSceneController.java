@@ -205,12 +205,7 @@ public class GameSceneController {
     @FXML
     void handleDragDropped(DragEvent event) {
         manager.cardDroppingReq(event.getDragboard().getString(),event.getSceneX(),event.getSceneY());
-    }
-
-    @FXML
-    void done(DragEvent event) {
-
-        System.out.println("Done");
+        event.consume();
     }
 
     private String getCard(MouseEvent event){

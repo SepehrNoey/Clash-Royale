@@ -17,6 +17,7 @@ import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Manager {
@@ -78,13 +79,14 @@ public class Manager {
         TimeUpdater timeUpdater = new TimeUpdater(sceneController.getTimeLabel());
         TaskForTime taskForTime = new TaskForTime(timeUpdater);
         timeTimer.schedule(taskForTime, 0 , 1000);
+
         elixir = 0; // handled for elixir updater
         elixirTimer = new Timer();
-        elixirUpdater = new ElixirUpdater(this , elixirTimer ,85,elixir, sceneController.getBarsPane());
+        elixirUpdater = new ElixirUpdater(this , elixirTimer ,85, sceneController.getBarsPane());
         elixirUpdater.fastUpdate((int)sceneController.getBarsPane().getChildren().get(6).getLayoutY());
 
         TaskForElixir taskForElixir = new TaskForElixir(elixirUpdater);
-
+        elixirUpdater.setItsTask(taskForElixir);
         elixirTimer.schedule(taskForElixir,0,27);
 
 
@@ -110,8 +112,8 @@ public class Manager {
     }
 
     public void cardDroppingReq(String card , double x , double y){
-//        elixirUpdater.decrease(5);
-//        System.out.println("here!!");
+        elixirUpdater.decrease(5);
+
         Card chosen = getCardByStr(card); // cards must be allocated before start!!! (4 first card in hand)
         if (!board.isValidAddress(chosen,x,y))
             return;
