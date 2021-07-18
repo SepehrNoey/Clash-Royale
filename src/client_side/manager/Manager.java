@@ -39,6 +39,7 @@ public class Manager {
     private ElixirUpdater elixirUpdater;
     private Timer elixirTimer;
     private String botName;
+    private int cardUsedNum; // is used for creating a distinct id for each card - but towers are ignored !!!!
 
     /**
      * constructor and initializer
@@ -47,6 +48,7 @@ public class Manager {
      * @param scene scene of the game
      */
     public Manager(Player player, String gameMode,String botName, Scene scene){
+        cardUsedNum = 0;
         this.scene = scene;
         this.botName = botName;
         this.player = player;
@@ -128,7 +130,11 @@ public class Manager {
         if (chosen.getCost() > elixir) // is updated by gui
             return;
         elixirUpdater.decrease(chosen.getCost());
+
         // valid choosing
+
+
+        // here must make id !!!! for each card (barbarian = 4)
 
         player.getSender().sendMsg(new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType() + "," + tileX + "," + tileY));
         chosen.setCoordinates(new Point2D(tileX , tileY));

@@ -3,16 +3,12 @@ package server_side.manager;
 import javafx.geometry.Point2D;
 import server_side.model.Bot;
 import shared.enums.BoardTypes;
-import shared.enums.CardTypes;
+import shared.enums.MessageType;
 import shared.model.Board;
 import shared.model.Message;
 import shared.model.player.Player;
-import shared.model.troops.card.BuildingCard;
+import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
-import shared.model.troops.card.SoldierCard;
-import shared.model.troops.card.SpellCard;
-import shared.model.troops.timerTasks.CoordinateUpdater;
-
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,9 +23,11 @@ public class Logic implements Runnable {
     private String gameMode;
     private Player humanPlayer;
     private Bot botPlayer;
+    private int cardUsedNum;
 
     public Logic(ArrayBlockingQueue<Message> inGameInbox , ArrayBlockingQueue<Message> toCheckEvents ,String gameMode,Player humanPlayer , Bot botPlayer)
     {
+        cardUsedNum = 0;
         this.humanPlayer = humanPlayer;
         this.botPlayer = botPlayer;
         this.inGameInbox = inGameInbox;
@@ -43,7 +41,7 @@ public class Logic implements Runnable {
         timer = new Timer();
         this.toCheckEvents = toCheckEvents;
         this.board = new Board(gameMode.equals("2v2") ? BoardTypes.FOUR_PLAYERS : BoardTypes.TWO_PLAYERS , true , humanPlayer.getName() , humanPlayer.getLevel() , gameMode);
-        board.addTowers(board.getType() , humanPlayer.getName());
+        board.addTowers(board.getType() , humanPlayer.getName() , inGameInbox);
     }
 
 //    public boolean isFinished(){
@@ -78,49 +76,85 @@ public class Logic implements Runnable {
                     System.out.println("Interrupted in getting new event in logic (toCheckEvents). Shouldn't happen. Error!");
                     e.printStackTrace();
                 }
-                this.firstTimeHandle(event);
+                if (event.getType() == MessageType.PICKED_CARD)
+                {
+                    this.firstTimeHandle(event);
+                }
+                else if (event.getType() == MessageType.CHARACTER_DIED)
+                {
+                    
+                }
             }
 
 
         }
     }
 
-    public void firstTimeHandle(Message event){
+    public void firstTimeHandle(Message event) {
         // calculate where to go and in how much time
         String playerName = event.getSender();
         String[] split = event.getContent().split(","); // cardType , x , y
         String cardType = split[0];
         int tileX = Integer.parseInt(split[1]);
         int tileY = Integer.parseInt(split[2]);
-        Card chosen = getCardByStr(cardType , playerName);
-        chosen.setCoordinates(new Point2D(tileX , tileY));
-        board.addTroop(chosen);
-        if (chosen instanceof SoldierCard)
+        Card chosen = getCardByStr(cardType, playerName);
+        chosen.setInGameInbox(inGameInbox);
+        if (chosen.getCount() == 1) // valid is checked before
         {
-            SoldierCard soldier = (SoldierCard) chosen;
-            String direction = soldier.decideWhereToGo(board);
-            Timer timer = new Timer();
-            timer.schedule(new CoordinateUpdater(soldier,direction, board.getCoordinateUpdateQueue()) , 0 ,  1000 / soldier.getMovingSpeed().getValue());
-            board.getTroopsTimer().put(soldier ,timer);
+            chosen.setCoordinates(new Point2D(tileX, tileY));
+            cardUsedNum++;
+            chosen.setId(cardUsedNum);
+            board.addTroop(chosen);
+            chosen.updateState(board,null,false);
         }
-        else if (chosen instanceof BuildingCard)
-        {
-            BuildingCard buildingCard = (BuildingCard) chosen;
+        else
+        { // it may need to be changed for some special cases - it is used for adding troops that their count is more than 1 .
+            chosen.setCoordinates(new Point2D(tileX, tileY));
+            board.addTroop(chosen);
+            chosen.updateState(board,null,false);
+            cardUsedNum++;
+            chosen.setId(cardUsedNum);
+            for (int i = 0 ; i < chosen.getCount() - 1 ; i++)
+            {
+                if (board.isValidAddress(chosen , tileX - 1 , tileY))
+                {
+                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX - 1 , tileY) , chosen.getOwner());
+                    newCard.setInGameInbox(inGameInbox);
+                    cardUsedNum++;
+                    newCard.setId(cardUsedNum);
+                    board.addTroop(newCard);
+                    newCard.updateState(board,null,false);
+                }
+                else if (board.isValidAddress(chosen,tileX + 1 , tileY))//not valid
+                {
+                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX + 1 , tileY) , chosen.getOwner());
+                    newCard.setInGameInbox(inGameInbox);
+                    board.addTroop(newCard);
+                    cardUsedNum++;
+                    newCard.setId(cardUsedNum);
+                    newCard.updateState(board,null,false);
+                }
+                else if (board.isValidAddress(chosen,tileX , tileY -1))
+                {
+                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX , tileY - 1) , chosen.getOwner());
+                    newCard.setInGameInbox(inGameInbox);
+                    cardUsedNum++;
+                    newCard.setId(cardUsedNum);
+                    board.addTroop(newCard);
+                    newCard.updateState(board,null,false);
+                }
+                else if (board.isValidAddress(chosen,tileX , tileY  + 1))
+                {
+                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX , tileY + 1) , chosen.getOwner());
+                    newCard.setInGameInbox(inGameInbox);
+                    cardUsedNum++;
+                    newCard.setId(cardUsedNum);
+                    board.addTroop(newCard);
+                    newCard.updateState(board,null,false);
+                }
+            }
         }
-        else if (chosen.getType() == CardTypes.RAGE)
-        {
-            
-
-
-        }
-        else if (chosen instanceof SpellCard) // arrows and fireball
-        {
-
-        }
-
-
     }
-
 
 
     public Card getCardByStr(String cardType , String owner){

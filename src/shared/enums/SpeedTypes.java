@@ -6,10 +6,9 @@ public enum SpeedTypes {
     FAST(3),
     VERY_FAST(4); // is used for spells
 
+    private double value;
 
-    private final int value;
-
-    private SpeedTypes(int value)
+    private SpeedTypes(double value)
     {
         this.value = value;
     }
@@ -18,7 +17,13 @@ public enum SpeedTypes {
      * getter for value of each enum
      * @return value of each enum
      */
-    public int getValue() {
+    public double getValue() {
         return value;
     }
+
+    public void setValue(double newSpeed)
+    {
+        this.value = newSpeed;
+    }
+
 }

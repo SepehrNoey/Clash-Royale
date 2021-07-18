@@ -34,7 +34,12 @@ public class CoordinateUpdater extends TimerTask {
     }
 
     private void setXYChange(){
-        if (slope.equals("up"))
+        if (slope.equals("rage"))
+        {
+            xToChange = 0;
+            yToChange = 0;
+        }
+        else if (slope.equals("up"))
         {
             yToChange = -1;
             xToChange = 0;

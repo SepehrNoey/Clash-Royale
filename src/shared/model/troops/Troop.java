@@ -2,17 +2,21 @@ package shared.model.troops;
 
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import shared.enums.CardTypes;
-import shared.enums.SpeedTypes;
-import shared.enums.TargetTypes;
-import shared.enums.TowerTypes;
+import shared.enums.*;
+import shared.model.Board;
+import shared.model.Message;
 import shared.model.troops.card.BuildingCard;
+import shared.model.troops.card.Card;
 import shared.model.troops.card.SoldierCard;
 import shared.model.troops.card.SpellCard;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
 
-public abstract class Troop {
+
+public abstract class Troop extends TimerTask{
     private int damage; // except rage card
     private int level;
     private Image[] attackFrames; // all troops have attack frames
@@ -22,6 +26,10 @@ public abstract class Troop {
     private TargetTypes target;
     private Point2D coordinates;
     private String owner;
+    private Troop targetToDoAct; // the point where target is - if this target is null , then it means there is no target - can be used for rendering
+    private Timer actTimer;
+    private ArrayBlockingQueue<Message> inGameInbox;
+    private String id; // an special distinct id for each troop
 
     public Troop(boolean isServerSide,int damage , int level , String attackFrmPath , int attackFrmNum , int width ,
                  int height , double range , TargetTypes target , Point2D coordinates , String owner)
@@ -182,21 +190,21 @@ public abstract class Troop {
             return new SpellCard(isServerSide,typeParam,3,0 // doesn't have damage
                     ,level, "client_side/view/pics/rage.png", "client_side/view/pics/rage", // attack frame and card frame are same
                     1,30,45,5,TargetTypes.AIR_GROUND,1,false,point2D,owner,SpeedTypes.FAST // this can be changed later
-                    ,40,40,40,false);
+                    ,40,40,40,false , level == 1 ? 6: level == 2 ? 6.5 : level == 3 ? 7 : level == 4 ? 7.5 : 8 );
         }
         else if (typeParam == CardTypes.FIREBALL)
         {
             return new SpellCard(isServerSide,typeParam,4,level == 1 ? 325 : level == 2 ? 357 : level == 3? 393 : level == 4 ? 432 : 474
                     ,level,"client_side/view/pics/fireball.png","client_side/view/pics/fireball",
                     6,80,200,2.5,null,1,true,point2D,owner,SpeedTypes.VERY_FAST // this can be changed later
-                    ,0,0,0,true);
+                    ,0,0,0,true , 0);
         }
         else if (typeParam == CardTypes.ARROWS)
         {
             return new SpellCard(isServerSide,typeParam,3,level == 1 ? 144 : level == 2 ? 156 : level == 3? 174 : level == 4 ? 189 : 210
                     ,level,"client_side/view/pics/arrow.png","client_side/view/pics/arrow",
                     1,30,80,4,null,1,false,point2D,owner,SpeedTypes.VERY_FAST // this can be changed later
-                    ,0,0,0,true);
+                    ,0,0,0,true , 0);
         }
         else if (typeParam == CardTypes.CANNON) // explosion can be added as dieFrm
         {
@@ -236,4 +244,151 @@ public abstract class Troop {
     public void setCoordinates(Point2D coordinates) {
         this.coordinates = coordinates;
     }
+
+    /**
+     * to check if can attack anyone or not
+     * @return true if can , false if can't
+     */
+    public abstract boolean canAttack(Troop troop);
+
+    /**
+     * setter
+     * @param targetToDoAct the point of target
+     */
+    public void setTargetToDoAct(Troop targetToDoAct){
+        this.targetToDoAct = targetToDoAct;
+    }
+
+    /**
+     * getter
+     * @return point of target - if no target , then returns null
+     */
+    public Troop getTargetToDoAct() {
+        return targetToDoAct;
+    }
+
+    /**
+     * setter
+     * @param actTimer timer for doing act
+     */
+    public void setActTimer(Timer actTimer) {
+        this.actTimer = actTimer;
+    }
+
+    /**
+     * getter
+     * @return timer of acting
+     */
+    public Timer getActTimer() {
+        return actTimer;
+    }
+
+    public abstract void setHp(int damage);
+    public abstract int getHp();
+
+    public void getBeingHit(int damage) // attention ! deleting from board happens in other methods ...
+    {
+        this.setHp(damage);
+        if (getHp() == 0) // sending die message to logic or board
+        {
+            try {
+                inGameInbox.put(new Message(MessageType.CHARACTER_DIED ,getOwner(),getId()));
+                actTimer.cancel();
+                this.setTargetToDoAct(null);
+                if (this instanceof SoldierCard)
+                {
+                    SoldierCard soldierCard = (SoldierCard) this;
+                    soldierCard.getWalkTimer().cancel();
+                }
+                else if (this instanceof SpellCard)
+                {
+                    SpellCard spellCard = (SpellCard) this;
+                    spellCard.getWalkTimer().cancel();
+                }
+            }
+            catch (InterruptedException e)
+            {
+                System.out.println( this.getOwner()+ " interrupted while sending character died message.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public abstract void setHitSpeed(double newHitSpeed);
+    public abstract void updateState(Board board , Card changedCard , boolean isDead);
+    public abstract double getHitSpeed();
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public abstract void setMovingSpeed(double newSpeed);
+
+    public abstract SpeedTypes getMovingSpeed();
+
+    /**
+     * getter
+     * @return arrayBlockingQueue of inGameInbox
+     */
+    public ArrayBlockingQueue<Message> getInGameInbox() {
+        return inGameInbox;
+    }
+
+    /**
+     * setter - this setter must be called! before using Troops
+     * @param inGameInbox the inGameInbox of GameLoop
+     */
+    public void setInGameInbox(ArrayBlockingQueue<Message> inGameInbox) {
+        this.inGameInbox = inGameInbox;
+    }
+
+    /**
+     * setter - this must be called ! when this card is used for first time - just for cards
+     * @param cardUsedNum a parameter for making id
+     */
+    public void setId(int cardUsedNum)
+    {
+        this.id = getOwner() + "," + cardUsedNum;
+    }
+
+    /**
+     * setter - this must be called ! when this tower is used for first time - just for towers
+     *  for towers id is like this : ownerName,towerType(left or middle or right)
+     */
+    public void setId()
+    {
+        Tower tower = (Tower) this;
+        String type = "";
+        if (tower.getType() == TowerTypes.KING_TOWER)
+            type = "middle";
+        else {
+            if ((int)tower.getCoordinates().getX() == 3) // the left tower
+                type = "left";
+            else
+                type = "right";
+        }
+        id = tower.getOwner() + "," + type;
+    }
+
+    /**
+     * getter
+     * @return id of this troop
+     */
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (o == this)
+            return true;
+        if (!(o instanceof Troop))
+            return false;
+
+        Troop troop = (Troop) o;
+        return troop.getId().equals(this.getId());
+    }
+
+
+
 }

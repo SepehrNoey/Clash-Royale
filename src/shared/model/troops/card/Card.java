@@ -4,9 +4,11 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import shared.enums.CardTypes;
 import shared.enums.TargetTypes;
+import shared.model.Message;
 import shared.model.troops.Troop;
 
 import java.io.Serializable;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public abstract class Card extends Troop implements Serializable {
     private CardTypes type;
@@ -15,7 +17,7 @@ public abstract class Card extends Troop implements Serializable {
     private int count;
     private boolean areaSplash;
 
-    public Card(boolean isServerSide,CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
+    public Card(boolean isServerSide, CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                 int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates , String owner)
     {
         super(isServerSide,damage, level, attackFrmPath, attackFrmNum, width, height, range, target, coordinates , owner);

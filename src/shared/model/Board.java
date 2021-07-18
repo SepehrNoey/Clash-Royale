@@ -8,10 +8,8 @@ import shared.enums.TowerTypes;
 import shared.model.troops.Tower;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 
 public class Board implements Runnable {
@@ -24,7 +22,6 @@ public class Board implements Runnable {
     private String humanPlayer;
     private String botName;
     private int humanLevel;
-    private HashMap<Troop , Timer> troopsTimer;
     private LinkedTransferQueue<Card> coordinateUpdateQueue;
 
     public Board(BoardTypes type , boolean isServerSide , String humanPlayer , int humanLevel , String botName){
@@ -36,7 +33,6 @@ public class Board implements Runnable {
         addedTroops = new ArrayList<>();
         this.isServerSide = isServerSide;
         makeRawBoard();
-        troopsTimer = new HashMap<>();
         coordinateUpdateQueue = new LinkedTransferQueue<>();
     }
 
@@ -167,62 +163,91 @@ public class Board implements Runnable {
         else return false;
     }
 
-    public void addTowers(BoardTypes boardType , String playerName)
+    /**
+     * center of towers are set for coordinates
+     * @param boardType two or four players board
+     * @param playerName who is these towers for
+     * @param inGameInbox is used for sending data to gameLoop
+     */
+    public void addTowers(BoardTypes boardType , String playerName , ArrayBlockingQueue<Message> inGameInbox)
     {
         if (boardType == BoardTypes.TWO_PLAYERS)  // attention !! point2D is addressed by index  0 to MAX !!! - like Board
         {
             // player towers
-            this.addTroop(Troop.makeTroop(false, TowerTypes.KING_TOWER.toString() , humanLevel ,
-                    new Point2D(9,25) , playerName));
-            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
-                    new Point2D(4,24) , playerName));
-            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
-                    new Point2D(15,24) , playerName));
+            Troop troop = null;
+            troop = Troop.makeTroop(false, TowerTypes.KING_TOWER.toString() , humanLevel ,
+                    new Point2D(10,26) , playerName);
+            troop.setInGameInbox(inGameInbox);
+            troop.setId();
+
+            this.addTroop(troop);
+
+            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(4,25) , playerName);
+            troop.setInGameInbox(inGameInbox);
+            troop.setId();
+            this.addTroop(troop);
+
+            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(16,25) , playerName);
+            troop.setInGameInbox(inGameInbox);
+            troop.setId();
+            this.addTroop(troop);
 
             // bot towers
-            this.addTroop(Troop.makeTroop(false,TowerTypes.KING_TOWER.toString() , humanLevel ,
-                    new Point2D(9,3) , botName));// attention : !! game mode is set for bot name
-            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
-                    new Point2D(4,4) , botName));
-            this.addTroop(Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
-                    new Point2D(15,4) , botName));
+            troop = Troop.makeTroop(false,TowerTypes.KING_TOWER.toString() , humanLevel ,
+                    new Point2D(10,3) , botName);
+            troop.setInGameInbox(inGameInbox);
+            troop.setId();
+            this.addTroop(troop); // attention : !! game mode is set for bot name
 
+            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(4,5) , botName);
+            troop.setInGameInbox(inGameInbox);
+            troop.setId();
+            this.addTroop(troop);
+
+            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+                    new Point2D(16,5) , botName);
+            troop.setInGameInbox(inGameInbox);
+            troop.setId();
+            this.addTroop(troop);
         }
         else {
             // for four player board
         }
     }
 
-    public Troop getNearestEnemy(int x , int y){
-        int xMin = 0;
-        int yMin = 0;
-        for (Troop troop:addedTroops)
-        {
-            if (!troop.getOwner().equals(humanPlayer))
-            {
-                xMin = (int)troop.getCoordinates().getX();
-                yMin = (int)troop.getCoordinates().getY();
-                break;
-            }
-        }
-        Troop nearest = null;
-
-        for (Troop troop:addedTroops)
-        {
-            int xEnemy = (int)troop.getCoordinates().getX();
-            int yEnemy = (int)troop.getCoordinates().getY();
-            if (!troop.getOwner().equals(humanPlayer))
-            {
-                if ( (Math.pow(x - xEnemy , 2) + Math.pow(y - yEnemy , 2 )) <= (Math.pow(x - xMin , 2) + Math.pow(y - yMin , 2 )))
-                {
-                    xMin = xEnemy;
-                    yMin = yEnemy;
-                    nearest = troop;
-                }
-            }
-        }
-        return nearest; // nearest enemy
-    }
+//    public Troop getNearestEnemy(int x , int y){
+//        int xMin = 0;
+//        int yMin = 0;
+//        for (Troop troop:addedTroops)
+//        {
+//            if (!troop.getOwner().equals(humanPlayer))
+//            {
+//                xMin = (int)troop.getCoordinates().getX();
+//                yMin = (int)troop.getCoordinates().getY();
+//                break;
+//            }
+//        }
+//        Troop nearest = null;
+//
+//        for (Troop troop:addedTroops)
+//        {
+//            int xEnemy = (int)troop.getCoordinates().getX();
+//            int yEnemy = (int)troop.getCoordinates().getY();
+//            if (!troop.getOwner().equals(humanPlayer))
+//            {
+//                if ( (Math.pow(x - xEnemy , 2) + Math.pow(y - yEnemy , 2 )) <= (Math.pow(x - xMin , 2) + Math.pow(y - yMin , 2 )))
+//                {
+//                    xMin = xEnemy;
+//                    yMin = yEnemy;
+//                    nearest = troop;
+//                }
+//            }
+//        }
+//        return nearest; // nearest enemy
+//    }
 
     @Override
     public void run() {
@@ -235,7 +260,7 @@ public class Board implements Runnable {
                 System.out.println("Exception in getting updated coordinates.");
                 e.printStackTrace();
             }
-            updateAllTimers(updatedCard);
+            notifyAllTroops(updatedCard);
 
 
 
@@ -243,10 +268,10 @@ public class Board implements Runnable {
         }
     }
 
-    public void updateAllTimers(Card changedCard){ // the card which its coordinates are updated
+    public void notifyAllTroops(Card changedCard){ // the card which its coordinates are updated
         for (Troop troop:addedTroops)
         {
-
+            troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
         }
     }
 
@@ -300,14 +325,6 @@ public class Board implements Runnable {
     }
 
     /**
-     * getter for troopTimers
-     * @return troopTimers
-     */
-    public HashMap<Troop, Timer> getTroopsTimer() {
-        return troopsTimer;
-    }
-
-    /**
      * getter
      * @return CoordinateUpdateQueue
      */
@@ -315,8 +332,29 @@ public class Board implements Runnable {
         return coordinateUpdateQueue;
     }
 
-//    public String makeSlope(Point2D start , Point2D destination){
-//        if (start.getX() == )
-//    }
+    /**
+     * getter
+     * @return added troops
+     */
+    public ArrayList<Troop> getAddedTroops() {
+        return addedTroops;
+    }
+
+    public ArrayList<Troop> getNearEnemies(Troop thisTroop){
+        ArrayList<Troop> nearEnemies = new ArrayList<>();
+        for (Troop troop:addedTroops)
+            if (thisTroop.canAttack(troop))
+                nearEnemies.add(troop);
+        return nearEnemies;
+    }
+
+    public Troop getTroopByID(String id){
+        for (Troop troop:addedTroops)
+        {
+            if (troop.getId().equals(id))
+                return troop;
+        }
+        return null;
+    }
 
 }
