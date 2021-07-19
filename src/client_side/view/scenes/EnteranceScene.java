@@ -27,11 +27,17 @@ public abstract class EnteranceScene {
     protected Label usernameLable;
     protected Label passwordLable;
     protected ImageView op;
+    protected ImageView king;
+    protected ImageView backView;
     protected ExecutorService executor;
 
     public EnteranceScene(ExecutorService executor)
     {
         this.executor = executor;
+        backView = new ImageView(new Image("client_side/view/pics/back3.png"));
+        backView.setFitWidth(630);
+        backView.setFitHeight(900);
+
         backBlack = new Image("client_side/view/pics/backBlack.png");
         backWhite = new Image("client_side/view/pics/backWhite.png");
         back = new ImageView(backBlack);
@@ -45,6 +51,14 @@ public abstract class EnteranceScene {
         info.setFitHeight(50);
         info.setTranslateX(130); // changed
         info.setTranslateY(200);
+
+
+        king = new ImageView(new Image("client_side/view/pics/king.png"));
+        king.setFitWidth(200);
+        king.setFitHeight(380);
+        king.setTranslateX(400);
+        king.setTranslateY(500);
+
 
         usernameLable = new Label();
         usernameLable.setText("User Name : ");

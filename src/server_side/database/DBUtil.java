@@ -169,4 +169,22 @@ public class DBUtil {
 
     }
 
+    public void updateLevelXp(Player player)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("UPDATE players SET `level`='");
+        sb.append(player.getLevel());
+        sb.append("', xp='");
+        sb.append(player.getXp());
+        sb.append("' WHERE username='");
+        sb.append(player.getName());
+        sb.append("'");
+        try {
+            statement.executeUpdate(sb.toString());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
 }

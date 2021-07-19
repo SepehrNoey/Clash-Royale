@@ -49,7 +49,7 @@ public class MenuScene {
     public Group buildScene()
     {
         Group menu = new Group();
-        ImageView back = new ImageView(new Image("client_side/view/pics/menuBack.png"));
+        ImageView back = new ImageView(new Image("client_side/view/pics/menuBack2.png"));
         back.setFitWidth(630);
         back.setFitHeight(900);
         menu.getChildren().add(back);
@@ -606,7 +606,8 @@ public class MenuScene {
             logOut.setImage(logOutBlack);
         });
         logOut.setOnMouseClicked(e->{
-
+            player.getSender().sendMsg(new Message(MessageType.LOG_OUT,"player",""));
+            System.exit(1);
         });
     }
 

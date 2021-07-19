@@ -22,16 +22,22 @@ public class MainScene {
 
         signUpBlack = new Image("client_side/view/pics/signUpBlack.png");
         signUpWhite = new Image("client_side/view/pics/signUpWhite.png");
-        ImageView background = new ImageView(new Image("client_side/view/pics/back.jpg"));
+        ImageView background = new ImageView(new Image("client_side/view/pics/back2.jpg"));
+        ImageView logo = new ImageView(new Image("client_side/view/pics/logo.png"));
         logInBlack = new Image("client_side/view/pics/logInBlack.png");
         logInWhite = new Image("client_side/view/pics/logInWhite.png");
         signUp = new ImageView(signUpBlack);
         logIn = new ImageView(logInBlack);
         mainPage.getChildren().add(background);
+        mainPage.getChildren().add(logo);
         mainPage.getChildren().add(signUp);
         mainPage.getChildren().add(logIn);
         background.setFitHeight(900);
         background.setFitWidth(630);
+        logo.setFitWidth(450);
+        logo.setFitHeight(120);
+        logo.setTranslateX(80);
+        logo.setTranslateY(80);
         signUp.setFitHeight(75);
         signUp.setFitWidth(150);
         logIn.setFitHeight(75);

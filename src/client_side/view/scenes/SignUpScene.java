@@ -50,6 +50,7 @@ public class SignUpScene extends EnteranceScene{
         title.setFitHeight(80);
 
 
+        signUpPage.getChildren().add(backView);
         signUpPage.getChildren().add(back);
         signUpPage.getChildren().add(title);
         signUpPage.getChildren().add(info);
@@ -58,6 +59,7 @@ public class SignUpScene extends EnteranceScene{
         signUpPage.getChildren().add(username);
         signUpPage.getChildren().add(password);
         signUpPage.getChildren().add(op);
+        signUpPage.getChildren().add(king);
         return signUpPage;
     }
 
@@ -93,7 +95,7 @@ public class SignUpScene extends EnteranceScene{
                     ArrayList<Card> cards = new ArrayList<>();
                     for(int i = 0 ; i < 12 ; i++)
                     {
-                        cards.add((Card) Troop.makeTroop(false,split[i + 4] , 1 , null,split[0]));
+                        cards.add((Card) Troop.makeTroop(false,split[i + 4] , 1 , null,split[0],null,null));
                     }
                     player = new Player(false,split[0] , split[3] , Integer.parseInt(split[1]) , Integer.parseInt(split[2]) , cards,server,oos,ois);
                     executor.execute(player.getGetter());

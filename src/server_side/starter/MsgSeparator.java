@@ -50,6 +50,10 @@ public class MsgSeparator implements Runnable{
                 player.getSender().sendMsg(history);
 
             }
+            else if(msg.getType() == MessageType.LOG_OUT)
+            {
+                System.exit(1);
+            }
             else if (msg.getType() == MessageType.GAME_MODE)
             {
                 try {

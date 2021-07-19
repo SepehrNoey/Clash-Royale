@@ -12,6 +12,7 @@ public enum MessageType implements Serializable {
     PROFILE,
     BATTLE_DECK,
     BATTLE_HISTORY,
+    LOG_OUT,
 
     // and in other in game types...
     GAME_MODE,
