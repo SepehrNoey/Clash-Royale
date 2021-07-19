@@ -5,14 +5,12 @@ import shared.enums.CardTypes;
 import shared.enums.SpeedTypes;
 import shared.enums.TargetTypes;
 import shared.model.Board;
-import shared.model.Message;
 import shared.model.troops.Troop;
 import shared.model.troops.timerTasks.CoordinateUpdater;
 import shared.model.troops.timerTasks.RageTask;
 
 import java.util.ArrayList;
 import java.util.Timer;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class SpellCard extends Card{
     private SpeedTypes movingSpeed; // the speed of moving or transitions on its node
@@ -148,10 +146,10 @@ public class SpellCard extends Card{
     /**
      * updateState for spellCards is just used at the beginning
      * @param board of play
-     * @param changedCard this parameter is not used for spellCards
+     * @param changedTroop this parameter is not used for spellCards
      * @param isDead this parameter is not used for spellCards
      */
-    public void updateState(Board board , Card changedCard , boolean isDead){
+    public void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException {
         this.board = board;
         setWalkTimer(new Timer());
         decideWhereToGo();

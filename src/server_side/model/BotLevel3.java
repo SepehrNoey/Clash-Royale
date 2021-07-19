@@ -1,6 +1,7 @@
 package server_side.model;
 
 import shared.model.Message;
+import shared.model.troops.card.Card;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -11,12 +12,12 @@ public class BotLevel3 extends Bot implements Runnable{
     }
 
     @Override
-    public void act() {
+    public void run(){
 
     }
 
     @Override
-    public void run(){
-
+    public String getPlaceForCard(Card chosen) {
+        return null;
     }
 }

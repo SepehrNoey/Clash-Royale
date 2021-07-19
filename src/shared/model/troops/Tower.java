@@ -88,11 +88,11 @@ public class Tower extends Troop{
         }
     }
 
-    public void updateState(Board board , Card changedCard , boolean isDead) {
+    public void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException {
         this.board = board;
         if (isDead)
         {
-            if (getTargetToDoAct() != null && changedCard.equals(getTargetToDoAct()))
+            if (getTargetToDoAct() != null && changedTroop.equals(getTargetToDoAct()))
             {
                 getActTimer().cancel();
                 setTargetToDoAct(null);
@@ -148,9 +148,4 @@ public class Tower extends Troop{
         return null; // fake
     }
 
-
-    public void setId(int cardUsedNum)
-    {
-
-    }
 }

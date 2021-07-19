@@ -220,7 +220,7 @@ public class SoldierCard extends Card{
         this.walkTask = walkTask;
     }
 
-    public void updateState(Board board , Card changedCard , boolean isDead){
+    public void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException {
         this.board = board;
         if (direction == null) // first time using
         {
@@ -238,7 +238,7 @@ public class SoldierCard extends Card{
         }
         else if (isDead) // updating state is because of dying some troop
         {
-            if (getTargetToDoAct() != null && getTargetToDoAct().equals(changedCard))
+            if (getTargetToDoAct() != null && getTargetToDoAct().equals(changedTroop))
             {
                 getActTimer().cancel();
                 setTargetToDoAct(null);
@@ -313,5 +313,13 @@ public class SoldierCard extends Card{
      */
     public Board getBoard() {
         return board;
+    }
+
+    /**
+     * setter
+     * @param walkTimer the new walkTimer
+     */
+    public void setWalkTimer(Timer walkTimer) {
+        this.walkTimer = walkTimer;
     }
 }

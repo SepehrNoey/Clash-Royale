@@ -32,7 +32,7 @@ public class MsgSeparator implements Runnable{
                 msg = sharedInbox.take();
             }catch (InterruptedException e){ // exiting here
                 System.out.println("msgSeparator interrupted. Closing msgSeparator...");
-                break;
+                System.out.println("it is may be because of end of game closing.");
             }
 
             if (msg.getType() == MessageType.PROFILE){
@@ -52,7 +52,7 @@ public class MsgSeparator implements Runnable{
             }
             else if(msg.getType() == MessageType.LOG_OUT)
             {
-                System.exit(1);
+                break;
             }
             else if (msg.getType() == MessageType.GAME_MODE)
             {

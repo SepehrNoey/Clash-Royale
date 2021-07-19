@@ -107,7 +107,7 @@ public abstract class EnteranceScene {
 
     public void loadMenu(Player player, Scene scene)
     {
-        MenuScene menu = new MenuScene();
+        MenuScene menu = new MenuScene(executor);
 
         scene.setRoot(menu.buildScene());
         menu.enableController(player,scene);

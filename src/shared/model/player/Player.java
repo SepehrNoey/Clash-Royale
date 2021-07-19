@@ -132,4 +132,17 @@ public class Player implements Serializable {
     public ArrayList<Card> getDeck() {
         return deck;
     }
+
+    public void updateProperty(int xpAmount)
+    {
+        xp += xpAmount;
+        if (xp > 300 && xp <= 500)
+            level = 2;
+        else if (xp > 500 && xp <= 900)
+            level = 3;
+        else if (xp > 900 && xp <= 1700)
+            level = 4;
+        else
+            level = 5;
+    }
 }

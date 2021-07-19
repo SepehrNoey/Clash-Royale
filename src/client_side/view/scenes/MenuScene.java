@@ -17,6 +17,8 @@ import shared.model.Message;
 import shared.model.player.Player;
 import shared.model.troops.card.Card;
 
+import java.util.concurrent.ExecutorService;
+
 public class MenuScene {
 
     private ImageView profile;
@@ -44,7 +46,12 @@ public class MenuScene {
     private Image v2White;
     private Image logOutBlack;
     private Image logOutWhite;
+    private ExecutorService executor;
 
+    public MenuScene(ExecutorService executor)
+    {
+        this.executor = executor;
+    }
 
     public Group buildScene()
     {
@@ -554,7 +561,7 @@ public class MenuScene {
         });
         bot1.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot1"));
-            Manager manager = new Manager(player , "bot1","bot1",scene);
+            Manager manager = new Manager(player , "bot1","bot1",scene , executor);
             manager.start();
         });
 
@@ -568,7 +575,7 @@ public class MenuScene {
         });
         bot2.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"bot2"));
-            Manager manager = new Manager(player , "bot2","bot2",scene);
+            Manager manager = new Manager(player , "bot2","bot2",scene,executor);
             manager.start();
         });
 
@@ -581,7 +588,7 @@ public class MenuScene {
         });
         v1.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"1v1"));
-            Manager manager = new Manager(player , "1v1","1v1",scene);
+            Manager manager = new Manager(player , "1v1","1v1",scene,executor);
             manager.start();
         });
 
@@ -594,7 +601,7 @@ public class MenuScene {
         });
         v2.setOnMouseClicked(e->{
             player.getSender().sendMsg(new Message(MessageType.GAME_MODE , player.getName(),"2v2"));
-            Manager manager = new Manager(player , "2v2","2v2",scene);
+            Manager manager = new Manager(player , "2v2","2v2",scene,executor);
             manager.start();
         });
 

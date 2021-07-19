@@ -6,13 +6,11 @@ import shared.enums.*;
 import shared.model.Board;
 import shared.model.Message;
 import shared.model.troops.card.BuildingCard;
-import shared.model.troops.card.Card;
 import shared.model.troops.card.SoldierCard;
 import shared.model.troops.card.SpellCard;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
 
@@ -299,11 +297,15 @@ public abstract class Troop extends TimerTask{
                 {
                     SoldierCard soldierCard = (SoldierCard) this;
                     soldierCard.getWalkTimer().cancel();
+                    soldierCard.setWalkTask(null);
+                    soldierCard.setWalkTimer(null);
                 }
                 else if (this instanceof SpellCard)
                 {
                     SpellCard spellCard = (SpellCard) this;
                     spellCard.getWalkTimer().cancel();
+                    spellCard.setWalkTask(null);
+                    spellCard.setWalkTimer(null);
                 }
             }
             catch (InterruptedException e)
@@ -315,7 +317,7 @@ public abstract class Troop extends TimerTask{
     }
 
     public abstract void setHitSpeed(double newHitSpeed);
-    public abstract void updateState(Board board , Card changedCard , boolean isDead);
+    public abstract void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException;
     public abstract double getHitSpeed();
 
     public void setDamage(int damage) {

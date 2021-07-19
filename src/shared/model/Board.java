@@ -169,45 +169,45 @@ public class Board implements Runnable {
      * @param playerName who is these towers for
      * @param inGameInbox is used for sending data to gameLoop
      */
-    public void addTowers(BoardTypes boardType , String playerName , ArrayBlockingQueue<Message> inGameInbox)
+    public void addTowers(boolean isServerSide,BoardTypes boardType , String playerName , ArrayBlockingQueue<Message> inGameInbox)
     {
         if (boardType == BoardTypes.TWO_PLAYERS)  // attention !! point2D is addressed by index  0 to MAX !!! - like Board
         {
             // player towers
             Troop troop = null;
-            troop = Troop.makeTroop(false, TowerTypes.KING_TOWER.toString() , humanLevel ,
+            troop = Troop.makeTroop(isServerSide, TowerTypes.KING_TOWER.toString() , humanLevel ,
                     new Point2D(10,26) , playerName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
 
             this.addTroop(troop);
 
-            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+            troop = Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
                     new Point2D(4,25) , playerName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
             this.addTroop(troop);
 
-            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+            troop = Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
                     new Point2D(16,25) , playerName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
             this.addTroop(troop);
 
             // bot towers
-            troop = Troop.makeTroop(false,TowerTypes.KING_TOWER.toString() , humanLevel ,
+            troop = Troop.makeTroop(isServerSide,TowerTypes.KING_TOWER.toString() , humanLevel ,
                     new Point2D(10,3) , botName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
             this.addTroop(troop); // attention : !! game mode is set for bot name
 
-            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+            troop = Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
                     new Point2D(4,5) , botName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
             this.addTroop(troop);
 
-            troop = Troop.makeTroop(false,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
+            troop = Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
                     new Point2D(16,5) , botName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
@@ -271,7 +271,11 @@ public class Board implements Runnable {
     public void notifyAllTroops(Card changedCard){ // the card which its coordinates are updated
         for (Troop troop:addedTroops)
         {
-            troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
+            try {
+                troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -348,13 +352,31 @@ public class Board implements Runnable {
         return nearEnemies;
     }
 
-    public Troop getTroopByID(String id){
+    public Troop getTroopByID(String id) throws InterruptedException{
         for (Troop troop:addedTroops)
         {
             if (troop.getId().equals(id))
                 return troop;
         }
         return null;
+    }
+
+    public void destroy(Troop destroyed){
+        if (destroyed.getId().contains("bot") && destroyed.getId().contains("left"))
+            isLeftUpAreaAllowed = true;
+        else if (destroyed.getId().contains("bot") && destroyed.getId().contains("right"))
+            isRightUpAreaAllowed = true;
+        else
+            addedTroops.remove(destroyed);
+    }
+
+    public ArrayList<Tower> getOfTowers(String owner)
+    {
+        ArrayList<Tower> towers = new ArrayList<>();
+        for (Troop troop: addedTroops)
+            if (troop.getOwner().equals(owner) && troop instanceof Tower)
+                towers.add((Tower)troop);
+        return towers;
     }
 
 }

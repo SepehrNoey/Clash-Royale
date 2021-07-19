@@ -6,6 +6,8 @@ import server_side.model.Bot;
 import shared.model.Message;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 
@@ -17,21 +19,35 @@ public class GameLoop {
     private Logic logic;
     private ExecutorService executor;
     private String gameMode;
+    private TimerTask timeEnded;
+    private Timer timer;
+
 
     public GameLoop(String gameMode,ArrayList<Player> players, Bot bot , ArrayBlockingQueue<Message> inGameInbox ,
                     ArrayBlockingQueue<Message> incomingEventsForBots ,ExecutorService executor){
         this.gameMode = gameMode;
         this.players = players;
+        this.timer = new Timer();
         if (bot != null)
             this.bot = bot;
         this.inGameInbox = inGameInbox;
         logic = new Logic(inGameInbox, new ArrayBlockingQueue<>(50) ,gameMode,players.get(0) , bot);
         this.executor = executor;
+        timeEnded = new TimerTask() {
+            @Override
+            public void run() {
+                executor.shutdownNow();
+            }
+        };
         this.incomingEventsForBots = incomingEventsForBots;
+
     }
 
     public void play(){
+        if (bot != null)
+            bot.setBoard(logic.getBoard());
         executor.execute(logic);
+        timer.schedule(timeEnded , 3 * 60 * 1000); // timer for 3 minutes
         Message event = null;
         for (Player player: players)
         {
@@ -48,9 +64,11 @@ public class GameLoop {
                 e.printStackTrace();
             }
             notifyPlayers(event);
-            logic.addToCheckEvent(event);
-//            if (logic.isFinished()) // handle later
-//                break;
+            if (event.getType() != MessageType.GAME_RESULT)
+                logic.addToCheckEvent(event);
+            else { // game is finished
+                System.out.println("Game finished.");
+            }
         }
     }
 

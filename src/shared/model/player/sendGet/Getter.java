@@ -27,11 +27,10 @@ public class Getter implements Runnable {
     public void run() {
         while(true) {
             Message msg = this.getMsg();
-
             try {
                 this.sharedInbox.put(msg);
             } catch (InterruptedException var3) {
-                var3.printStackTrace();
+                System.out.println("Interrupted in putting message. may it's because of end of game.");
             }
         }
     }

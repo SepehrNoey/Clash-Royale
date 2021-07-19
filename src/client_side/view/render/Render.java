@@ -1,29 +1,28 @@
 package client_side.view.render;
 
-import shared.enums.BoardTypes;
+import client_side.controller.GameSceneController;
 import shared.model.Board;
-import shared.model.Message;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class Render implements Runnable{
     private Board board;
     private String me;
-    private ArrayBlockingQueue<Message> inGameInbox;
     private ArrayList<Troop> allTroops; // it may be not important
+    private int cardUsedNum;
+    private GameSceneController controller;
 
-    public Render(String me , ArrayBlockingQueue<Message> inGameInbox , Board board){
-        this.me = me;
-        this.inGameInbox = inGameInbox;
+    public Render(String humanPlayer , Board board , GameSceneController controller){
+        cardUsedNum = 0;
+        this.me = humanPlayer;
         allTroops = new ArrayList<>();
         this.board = board;
+        this.controller = controller;
     }
 
     public void addForRender(Card card){
-
     }
 
 

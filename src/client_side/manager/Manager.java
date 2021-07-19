@@ -20,6 +20,8 @@ import shared.model.troops.card.Card;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 public class Manager {
     private Render render;
@@ -39,7 +41,8 @@ public class Manager {
     private ElixirUpdater elixirUpdater;
     private Timer elixirTimer;
     private String botName;
-    private int cardUsedNum; // is used for creating a distinct id for each card - but towers are ignored !!!!
+    private FakeLogic fakeLogic;
+    private ExecutorService executor;
 
     /**
      * constructor and initializer
@@ -47,8 +50,8 @@ public class Manager {
      * @param gameMode mode of game (1v1 , bot1 , ...)
      * @param scene scene of the game
      */
-    public Manager(Player player, String gameMode,String botName, Scene scene){
-        cardUsedNum = 0;
+    public Manager(Player player, String gameMode,String botName, Scene scene , ExecutorService executor){
+        this.executor = executor;
         this.scene = scene;
         this.botName = botName;
         this.player = player;
@@ -65,8 +68,8 @@ public class Manager {
         sceneController = loader.getController(); // shouldn't be null !
         sceneController.setManager(this); // connecting manager and fxmlController
         board = new Board(gameMode.equals("2v2") ? BoardTypes.FOUR_PLAYERS : BoardTypes.TWO_PLAYERS , false, player.getName() ,player.getLevel(), botName);
-        board.addTowers(board.getType() , player.getName());
-        render = new Render(player.getName() , player.getSharedInbox(), board); // the only messages that will be sent to render must be inGameMessages!!!
+        board.addTowers(false,board.getType() , player.getName() , player.getSharedInbox());
+        render = new Render(player.getName() , board , sceneController); // the only messages that will be sent to render must be inGameMessages!!!
         scene.setRoot(gameRoot);
         Starter.stage.setWidth(814);
 
@@ -101,6 +104,8 @@ public class Manager {
         sceneController.getCard2().setImage(card2.getCardImage());
         sceneController.getCard3().setImage(card3.getCardImage());
         sceneController.getCard4().setImage(card4.getCardImage());
+        fakeLogic = new FakeLogic(player,botName , gameMode,this,board,render);
+        executor.execute(fakeLogic);
 
     }
 
@@ -130,19 +135,9 @@ public class Manager {
         if (chosen.getCost() > elixir) // is updated by gui
             return;
         elixirUpdater.decrease(chosen.getCost());
-
         // valid choosing
-
-
-        // here must make id !!!! for each card (barbarian = 4)
-
         player.getSender().sendMsg(new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType() + "," + tileX + "," + tileY));
-        chosen.setCoordinates(new Point2D(tileX , tileY));
-        // + updating elixir bar
-        render.addForRender(chosen);
-
-
-
+        fakeLogic.addAndInitCard(chosen,tileX,tileY);
 
     }
 

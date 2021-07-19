@@ -1,6 +1,7 @@
 package server_side.model;
 
 import shared.enums.CardTypes;
+import shared.model.Board;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 import shared.model.Message;
@@ -8,6 +9,7 @@ import shared.model.Message;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public abstract class Bot implements Runnable{
@@ -16,7 +18,10 @@ public abstract class Bot implements Runnable{
     private ArrayList<Card> deck; // a bot just has a deck
     private ArrayBlockingQueue<Message> inGameInbox; // this is used to put events (events made by bots)
     private ArrayBlockingQueue<Message> incomingEvents; // this is used to get events made by other players or bots and taking action according to them
-
+    private int elixir;
+    private Timer elixirTimer;
+    private ElixirUpdaterForBot elixirUpdater;
+    private Board board;
 
     public Bot(ArrayBlockingQueue<Message> inGameInbox , ArrayBlockingQueue<Message> incomingEvents , int level)
     {
@@ -25,6 +30,10 @@ public abstract class Bot implements Runnable{
         this.incomingEvents = incomingEvents;
         deck = new ArrayList<>();
         setDeck();
+        elixir = 4;
+        elixirTimer = new Timer();
+        elixirUpdater = new ElixirUpdaterForBot(this);
+        elixirTimer.schedule(elixirUpdater,0,2000);
     }
 
     public void setDeck(){
@@ -37,8 +46,6 @@ public abstract class Bot implements Runnable{
             notUsed.remove(rand);
         }
     }
-
-    public abstract void act();
 
     public ArrayBlockingQueue<Message> getIncomingEvents() {
         return incomingEvents;
@@ -62,5 +69,36 @@ public abstract class Bot implements Runnable{
 
     public ArrayList<Card> getDeck() {
         return deck;
+    }
+
+    /**
+     * getter
+     * @return the object of elixir
+     */
+    public Integer getElixir() {
+        return elixir;
+    }
+
+    public synchronized void updateElixir(int elixir) {
+        this.elixir += elixir;
+        notifyAll();
+    }
+
+    /**
+     * setter
+     * @param board of game
+     */
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
+    public abstract String getPlaceForCard(Card chosen);
+
+    /**
+     * getter
+     * @return board of game
+     */
+    public Board getBoard() {
+        return board;
     }
 }
