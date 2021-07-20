@@ -48,9 +48,9 @@ public abstract class Troop extends TimerTask{
     }
 
 
-//    public Image getAttackFrm(){
-//
-//    }
+    public Image getAttackFrm(){
+        return attackFrames[0];
+    }
 
     /**
      * getter
@@ -296,7 +296,14 @@ public abstract class Troop extends TimerTask{
                 if (this instanceof SoldierCard)
                 {
                     SoldierCard soldierCard = (SoldierCard) this;
-                    soldierCard.getWalkTimer().cancel();
+                    try {
+                        soldierCard.getWalkTimer().cancel();
+
+                    }catch (Exception e)
+                    {
+
+                    }
+
                     soldierCard.setWalkTask(null);
                     soldierCard.setWalkTimer(null);
                 }
@@ -317,7 +324,7 @@ public abstract class Troop extends TimerTask{
     }
 
     public abstract void setHitSpeed(double newHitSpeed);
-    public abstract void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException;
+    public abstract void updateState(Board board , Troop changedTroop , boolean isDead);
     public abstract double getHitSpeed();
 
     public void setDamage(int damage) {
@@ -378,17 +385,6 @@ public abstract class Troop extends TimerTask{
      */
     public String getId() {
         return id;
-    }
-
-    @Override
-    public boolean equals(Object o){
-        if (o == this)
-            return true;
-        if (!(o instanceof Troop))
-            return false;
-
-        Troop troop = (Troop) o;
-        return troop.getId().equals(this.getId());
     }
 
 

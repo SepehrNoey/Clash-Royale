@@ -2,16 +2,16 @@ package shared.model.troops.timerTasks;
 
 import shared.model.troops.card.Card;
 import java.util.TimerTask;
-import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class CoordinateUpdater extends TimerTask {
     private Card card;
     private String slope;
     private int xToChange;
     private int yToChange;
-    private LinkedTransferQueue<Card> coordinateUpdateQueue;
+    private ArrayBlockingQueue<Card> coordinateUpdateQueue;
 
-    public CoordinateUpdater(Card card ,String slope ,LinkedTransferQueue<Card> coordinateUpdateQueue) {
+    public CoordinateUpdater(Card card ,String slope ,ArrayBlockingQueue<Card> coordinateUpdateQueue) {
         this.card = card;
         this.slope = slope;
         this.coordinateUpdateQueue = coordinateUpdateQueue;
@@ -23,8 +23,9 @@ public class CoordinateUpdater extends TimerTask {
         synchronized (this)
         {
             card.setCoordinates(card.getCoordinates().add(xToChange ,yToChange));
+            System.out.println("coordinate updated for " + card.getType().toString() + ": " + card.getCoordinates().getX() + "," + card.getCoordinates().getY());
             try {
-                coordinateUpdateQueue.transfer(card);
+                coordinateUpdateQueue.put(card);
             }catch (InterruptedException e)
             {
                 System.out.println("interrupted in putting updating coordinate queue.");
@@ -66,24 +67,11 @@ public class CoordinateUpdater extends TimerTask {
             if (direction.equals("right"))
             {
                 xToChange = 1;
-                if (shib > 0)
-                {
-                    yToChange = -1 * shib;
-                }
-                else if (shib < 0)
-                {
-                    yToChange = shib;
-                }
+                yToChange = -1 * shib;
             }
             else{
                 xToChange = -1;
-                if (shib > 0)
-                {
-                    yToChange = shib;
-                }
-                else {
-                    yToChange = -1 * shib;
-                }
+                yToChange = shib;
             }
         }
     }

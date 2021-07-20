@@ -20,11 +20,12 @@ public class SpellCard extends Card{
     private boolean reducedDmg; // reduced damage to crown towers
     private Timer walkTimer;
     private CoordinateUpdater walkTask;
-    private ArrayList<Troop> targets;
     private String direction; // will be used for rendering
     private int hp = 10; // fake
     private Board board;
     private double durationForRage;
+    private boolean isTimerSet;
+    private Point2D destination;
 
 
     public SpellCard(boolean isServerSide, CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
@@ -149,12 +150,27 @@ public class SpellCard extends Card{
      * @param changedTroop this parameter is not used for spellCards
      * @param isDead this parameter is not used for spellCards
      */
-    public void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException {
-        this.board = board;
-        setWalkTimer(new Timer());
-        decideWhereToGo();
-        setWalkTask(new CoordinateUpdater(this,direction, board.getCoordinateUpdateQueue()));
-        walkTimer.schedule(walkTask , 0 ,(int)(1000 / getMovingSpeed().getValue()) );
+    public void updateState(Board board , Troop changedTroop , boolean isDead) { // still has problem!!!
+        if (!isTimerSet)
+        {
+            destination = new Point2D(this.getCoordinates().getX() , this.getCoordinates().getY());
+            isTimerSet = true;
+            this.board = board;
+            setWalkTimer(new Timer());
+            decideWhereToGo();
+            setWalkTask(new CoordinateUpdater(this,direction, board.getCoordinateUpdateQueue()));
+            walkTimer.schedule(walkTask , 0 ,(int)(1000 / getMovingSpeed().getValue()) );
+        }
+        else {
+            if ((int)destination.getX() == (int)this.getCoordinates().getX() && (int)destination.getY() == (int)this.getCoordinates().getY())
+            {// destination is reached
+                walkTimer.cancel();
+                setWalkTimer(null);
+                setWalkTask(null);
+                setActTimer(new Timer());
+                getActTimer().schedule(this,0); // should i delete it from any list ???
+            }
+        }
     }
 
     private void decideWhereToGo(){

@@ -38,6 +38,7 @@ public class Manager {
     private Card card2;
     private Card card3;
     private Card card4;
+    private Card nextCard;
     private ElixirUpdater elixirUpdater;
     private Timer elixirTimer;
     private String botName;
@@ -95,18 +96,29 @@ public class Manager {
 
         TaskForElixir taskForElixir = new TaskForElixir(elixirUpdater);
         elixirUpdater.setItsTask(taskForElixir);
-        elixirTimer.schedule(taskForElixir,0,27);
+//        elixirTimer.schedule(taskForElixir,0,27);
+//        sceneController.getCard1().setUserData(player.getDeck().get(0));
+//        sceneController.getCard2().setUserData(player.getDeck().get(1));
+//        sceneController.getCard3().setUserData(player.getDeck().get(2));
+//        sceneController.getCard4().setUserData(player.getDeck().get(3));
+//        sceneController.getNextCard().setUserData(player.getDeck());
+
+
+
         card1 = player.getDeck().get(0);
         card2 = player.getDeck().get(1);
         card3 = player.getDeck().get(2);
         card4 = player.getDeck().get(3);
+        nextCard = player.getDeck().get(4);
         sceneController.getCard1().setImage(card1.getCardImage());
         sceneController.getCard2().setImage(card2.getCardImage());
         sceneController.getCard3().setImage(card3.getCardImage());
         sceneController.getCard4().setImage(card4.getCardImage());
+        sceneController.getNextCard().setImage(nextCard.getCardImage());
         fakeLogic = new FakeLogic(player,botName , gameMode,this,board,render);
-        executor.execute(fakeLogic);
-
+        this.executor.execute(fakeLogic);
+        this.executor.execute(render);
+        this.executor.execute(board);
     }
 
 
@@ -136,8 +148,11 @@ public class Manager {
             return;
         elixirUpdater.decrease(chosen.getCost());
         // valid choosing
-        player.getSender().sendMsg(new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType() + "," + tileX + "," + tileY));
-        fakeLogic.addAndInitCard(chosen,tileX,tileY);
+
+        System.out.println(chosen.getType().toString() + " card");
+        Message msg = new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType().toString() + "," + tileX + "," + tileY);
+        player.getSender().sendMsg(msg);
+        fakeLogic.addEvent(msg);
 
     }
 
@@ -155,11 +170,15 @@ public class Manager {
         return null;
     }
 
-
-
     public void updateElixir(int elixir){
         this.elixir = elixir;
     }
 
-
+    /**
+     * getter
+     * @return executor
+     */
+    public ExecutorService getExecutor() {
+        return executor;
+    }
 }

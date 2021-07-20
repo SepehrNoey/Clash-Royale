@@ -44,8 +44,13 @@ public class GameLoop {
     }
 
     public void play(){
-        if (bot != null)
+        if (bot != null){
             bot.setBoard(logic.getBoard());
+            executor.execute(bot);
+        }
+        executor.execute(logic.getBoard());
+
+
         executor.execute(logic);
         timer.schedule(timeEnded , 3 * 60 * 1000); // timer for 3 minutes
         Message event = null;

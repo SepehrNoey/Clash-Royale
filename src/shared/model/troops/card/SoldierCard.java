@@ -40,6 +40,7 @@ public class SoldierCard extends Card{
             for (int i = 0 ; i < dieFrmNum ; i++)
                 dieFrames[i] = new Image(dieFrmPath + i + ".png");
         }
+        direction = "";
     }
 
     @Override
@@ -117,12 +118,11 @@ public class SoldierCard extends Card{
     public void decideWhereToGo(Board board){
         if (getTarget() == TargetTypes.BUILDINGS) // giant
         {
-            String direction = board.getNearestWay(this , (int)getCoordinates().getX() , (int)getCoordinates().getY());
+            String direction = board.getNearestWay(this);
             setDirection(direction);
         }
         else{
-            Card enemyAround = board.isEnemyAround((int)getCoordinates().getX() , (int)getCoordinates().getY());
-            String direction = "";
+            Card enemyAround = board.isEnemyAround(this,(int)getCoordinates().getX() , (int)getCoordinates().getY());
             if (enemyAround != null && getTarget() == TargetTypes.AIR_GROUND || (getTarget() == TargetTypes.GROUND && !(enemyAround instanceof SpellCard
                     || enemyAround.getType() == CardTypes.BABY_DRAGON) ) ){
                 int xEnemy = (int)enemyAround.getCoordinates().getX();
@@ -133,12 +133,12 @@ public class SoldierCard extends Card{
                 {
                     if (yEnemy <= thisY)
                     {
-                        direction = "up";
+                        this.direction = "up";
                         setDirection(direction);
                     }
                     else
                     {
-                        direction = "down";
+                        this.direction = "down";
                         setDirection(direction);
                     }
                 }
@@ -146,12 +146,12 @@ public class SoldierCard extends Card{
                 {
                     if (xEnemy > thisX)
                     {
-                        direction = "right";
+                        this.direction = "right";
                         setDirection(direction);
                     }
                     else
                     {
-                        direction = "left";
+                        this.direction = "left";
                         setDirection(direction);
                     }
                 }
@@ -159,15 +159,18 @@ public class SoldierCard extends Card{
                     int slope = (int)((yEnemy - thisY) / (xEnemy - thisX));
                     if (xEnemy > thisX)
                     {
-                        direction = slope + "," + "right";
+                        this.direction = slope + "," + "right";
                         setDirection(direction);
                     }
                     else
                     {
-                        direction = slope + "," + "left";
+                        this.direction = slope + "," + "left";
                         setDirection(direction);
                     }
                 }
+            }
+            else { // no enemy near
+                setDirection(board.getNearestWay(this));
             }
         }
         if (walkTimer != null)
@@ -220,9 +223,9 @@ public class SoldierCard extends Card{
         this.walkTask = walkTask;
     }
 
-    public void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException {
+    public void updateState(Board board , Troop changedTroop , boolean isDead) {
         this.board = board;
-        if (direction == null) // first time using
+        if (direction.equals("")) // first time using
         {
             ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
             if (nearEnemies.size() > 0)
@@ -238,7 +241,7 @@ public class SoldierCard extends Card{
         }
         else if (isDead) // updating state is because of dying some troop
         {
-            if (getTargetToDoAct() != null && getTargetToDoAct().equals(changedTroop))
+            if (getTargetToDoAct() != null && getTargetToDoAct().getId().equals(changedTroop.getId()))
             {
                 getActTimer().cancel();
                 setTargetToDoAct(null);

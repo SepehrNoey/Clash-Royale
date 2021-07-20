@@ -2,6 +2,7 @@ package server_side.model;
 
 import shared.enums.MessageType;
 import shared.model.Message;
+import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 
 import java.util.Random;
@@ -19,23 +20,35 @@ public class BotLevel1 extends Bot implements Runnable{
         while (true)
         {
             int rand = random.nextInt(getDeck().size());
-            Card chosen = getDeck().get(rand);
-            if (getElixir() >= chosen.getCost())
+            Card fromDeck = getDeck().get(rand);
+            Card chosen = (Card) Troop.makeTroop(true,fromDeck.getType().toString(),getLevel(),null,getName());
+            while (true)
             {
-                String[] xy = getPlaceForCard(chosen).split(",");
-                try {
-                    getInGameInbox().put(new Message(MessageType.PICKED_CARD , getName(),chosen.getType() + "," + xy[0] + "," + xy[1]));
-                    updateElixir(-1 * chosen.getCost());
-                }catch (InterruptedException e)
+                if (getElixir() >= chosen.getCost())
                 {
-                    System.out.println(getName() + " interrupted while putting message to inGameInbox");
-                    e.printStackTrace();
+                    String[] xy = getPlaceForCard(chosen).split(",");
+                    try {
+                        getInGameInbox().put(new Message(MessageType.PICKED_CARD , getName(),chosen.getType() + "," + xy[0] + "," + xy[1]));
+                        updateElixir(-1 * chosen.getCost());
+                    }catch (InterruptedException e)
+                    {
+                        System.out.println(getName() + " interrupted while putting message to inGameInbox");
+                        e.printStackTrace();
+                    }
                 }
-            }
-            else {
-                try {
-                    this.wait();
-                }catch (InterruptedException e){}
+                else {
+                    try {
+                        Thread.sleep(2000);
+                    }catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+//                else {
+//                    try {
+//                        this.wait();
+//                    }catch (InterruptedException e){}
+//                }
             }
         }
     }

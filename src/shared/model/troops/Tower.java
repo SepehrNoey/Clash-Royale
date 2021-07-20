@@ -88,11 +88,11 @@ public class Tower extends Troop{
         }
     }
 
-    public void updateState(Board board , Troop changedTroop , boolean isDead) throws InterruptedException {
+    public void updateState(Board board , Troop changedTroop , boolean isDead) {
         this.board = board;
         if (isDead)
         {
-            if (getTargetToDoAct() != null && changedTroop.equals(getTargetToDoAct()))
+            if (getTargetToDoAct() != null && changedTroop.getId().equals(getTargetToDoAct().getId()))
             {
                 getActTimer().cancel();
                 setTargetToDoAct(null);

@@ -225,13 +225,7 @@ public class Logic implements Runnable {
 
 
     public Card getCardByStr(String cardType , String owner){
-        ArrayList<Card> toGetFrom = owner.contains("bot") ? botPlayer.getDeck() : humanPlayer.getCards(); // check is according to owner name
-        for (Card card:toGetFrom)
-        {
-            if (cardType.equals(card.getType().toString()))
-                return card;
-        }
-        return null;
+        return (Card)Troop.makeTroop(true,cardType, humanPlayer.getLevel(), null,owner);
     }
 
     /**

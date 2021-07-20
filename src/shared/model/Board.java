@@ -8,6 +8,8 @@ import shared.enums.TowerTypes;
 import shared.model.troops.Tower;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
+import shared.model.troops.card.SoldierCard;
+
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
@@ -22,7 +24,8 @@ public class Board implements Runnable {
     private String humanPlayer;
     private String botName;
     private int humanLevel;
-    private LinkedTransferQueue<Card> coordinateUpdateQueue;
+    private ArrayBlockingQueue<Card> coordinateUpdateQueue;
+    private ArrayBlockingQueue<Card> renderQueue;
 
     public Board(BoardTypes type , boolean isServerSide , String humanPlayer , int humanLevel , String botName){
         this.type = type;
@@ -33,7 +36,7 @@ public class Board implements Runnable {
         addedTroops = new ArrayList<>();
         this.isServerSide = isServerSide;
         makeRawBoard();
-        coordinateUpdateQueue = new LinkedTransferQueue<>();
+        coordinateUpdateQueue = new ArrayBlockingQueue<>(50);
     }
 
 
@@ -261,29 +264,31 @@ public class Board implements Runnable {
                 e.printStackTrace();
             }
             notifyAllTroops(updatedCard);
-
-
-
-
         }
     }
 
     public void notifyAllTroops(Card changedCard){ // the card which its coordinates are updated
         for (Troop troop:addedTroops)
         {
+            troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
             try {
-                troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
-            } catch (InterruptedException e) {
+                if (!isServerSide){
+                    renderQueue.put(changedCard);
+                    System.out.println("card is picked . notifying others..");
+                }
+            }catch (InterruptedException e)
+            {
                 e.printStackTrace();
             }
         }
+
     }
 
-    public Card isEnemyAround(int x , int y){ // towers are ignored!!!
+    public Card isEnemyAround(SoldierCard card, int x , int y){ // towers are ignored!!!
         for (Troop troop:addedTroops)  // checking a circle with radius sqrt(72)
         {
             if (Math.pow(x - troop.getCoordinates().getX() , 2) + Math.pow(y - troop.getCoordinates().getY() , 2) <= 72
-        && !(troop instanceof Tower ))
+        && !(troop instanceof Tower ) && !card.getId().equals(troop.getId()))
             {
                 return (Card) troop;
             }
@@ -294,36 +299,36 @@ public class Board implements Runnable {
 
 
 
-    public String getNearestWay(Card card,int x , int y){ // this method gives second destination (when character wants to go to road)
-        if (card.getOwner().contains("bot") && y == 25)
+    public String getNearestWay(Card card){ // this method gives second destination (when character wants to go to road)
+        if (card.getOwner().contains("bot") && (int)card.getCoordinates().getY() == 25)
         {
-            if (x <= 10)
+            if (card.getCoordinates().getX() <= 10)
                 return "right";
             else
                 return "left";
         }
-        else if (!card.getOwner().contains("bot") && y == 4)
+        else if (!card.getOwner().contains("bot") && (int)card.getCoordinates().getY() == 4)
         {
-            if (x <= 10)
+            if (card.getCoordinates().getX() <= 10)
                 return "right";
             else
                 return "left";
         }
-        else if ((board[x][y] == BoardThings.ROAD || board[x][y] == BoardThings.BRIDGE) &&
-                (board[x][y - 1] == BoardThings.ROAD || board[x][y -1] == BoardThings.BRIDGE))
+        else if ((board[(int)card.getCoordinates().getX()][(int)card.getCoordinates().getY()] == BoardThings.ROAD || board[(int)card.getCoordinates().getX()][(int)card.getCoordinates().getY()] == BoardThings.BRIDGE) &&
+                (board[(int)card.getCoordinates().getX()][(int)card.getCoordinates().getY() - 1] == BoardThings.ROAD || board[(int)card.getCoordinates().getX()][(int)card.getCoordinates().getY() -1] == BoardThings.BRIDGE))
         {
-            if (!card.getOwner().contains("bot"))
+            if (card.getOwner().contains("bot"))
                 return "down";
             else
                 return "up";
         }
-        else if (x < 3)
+        else if ((int)card.getCoordinates().getX() < 3)
             return "right";
-        else if (x > 3 && x <= 10)
+        else if ((int)card.getCoordinates().getX() >= 3 && (int)card.getCoordinates().getX() <= 10)
             return "left";
-        else if (x >= 10 && x <= 14)
+        else if ((int)card.getCoordinates().getX() >= 10 && (int)card.getCoordinates().getX() <= 14)
             return "right";
-        else if (x >= 18)
+        else if ((int)card.getCoordinates().getX() >= 18)
             return "left";
         return null;
     }
@@ -332,7 +337,7 @@ public class Board implements Runnable {
      * getter
      * @return CoordinateUpdateQueue
      */
-    public LinkedTransferQueue<Card> getCoordinateUpdateQueue() {
+    public ArrayBlockingQueue<Card> getCoordinateUpdateQueue() {
         return coordinateUpdateQueue;
     }
 
@@ -368,6 +373,17 @@ public class Board implements Runnable {
             isRightUpAreaAllowed = true;
         else
             addedTroops.remove(destroyed);
+
+        if (destroyed instanceof Card)
+        {
+            try {
+                renderQueue.put((Card) destroyed);
+            }catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public ArrayList<Tower> getOfTowers(String owner)
@@ -379,4 +395,8 @@ public class Board implements Runnable {
         return towers;
     }
 
+
+    public void setRenderQueue(ArrayBlockingQueue<Card> renderQueue) {
+        this.renderQueue = renderQueue;
+    }
 }

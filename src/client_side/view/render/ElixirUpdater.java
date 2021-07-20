@@ -43,13 +43,11 @@ public class ElixirUpdater implements Runnable {
             next.setFitWidth(41.5);
             if (barImageViews.size() < 10 * 85) {
                 barsPane.getChildren().add(next);
-                System.out.println("added " + next + "with nowY: " + nowY);
                 next.setTranslateX(nowX);
                 next.setTranslateY(nowY);
                 barImageViews.add(next);
                 synchronized (nowY){
                     nowY--;
-                    System.out.println("decreased nowY for next round: " + nowY);
                 }
                 repeatNum++;
                 if (repeatNum == barLength)  // may have bug here !!! because of double or int
@@ -68,20 +66,17 @@ public class ElixirUpdater implements Runnable {
 
     public void decrease(int elixir){
         currentElixir -= elixir;
-        System.out.println("after decrease: " + currentElixir);
         manager.updateElixir(currentElixir);
 
         for(int i = 0 ; i < 85 * elixir ;i++)
         {
             ImageView imgView = barImageViews.get(barImageViews.size() -1);
             imgView.setImage(null);
-            System.out.println("set null for " + (barImageViews.size() - 1));
             barsPane.getChildren().remove(imgView);
             barImageViews.remove(imgView);
         }
         synchronized (nowY){
             nowY = nowY + 85 * elixir + elixir; // fix here
-            System.out.println("increased nowY: " + nowY);
         }
     }
 
