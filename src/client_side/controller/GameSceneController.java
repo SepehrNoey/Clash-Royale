@@ -8,6 +8,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import shared.model.troops.Troop;
+import shared.model.troops.card.Card;
 
 public class GameSceneController {
 

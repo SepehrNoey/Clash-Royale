@@ -96,15 +96,7 @@ public class Manager {
 
         TaskForElixir taskForElixir = new TaskForElixir(elixirUpdater);
         elixirUpdater.setItsTask(taskForElixir);
-//        elixirTimer.schedule(taskForElixir,0,27);
-//        sceneController.getCard1().setUserData(player.getDeck().get(0));
-//        sceneController.getCard2().setUserData(player.getDeck().get(1));
-//        sceneController.getCard3().setUserData(player.getDeck().get(2));
-//        sceneController.getCard4().setUserData(player.getDeck().get(3));
-//        sceneController.getNextCard().setUserData(player.getDeck());
-
-
-
+        elixirTimer.schedule(taskForElixir,0,27);
         card1 = player.getDeck().get(0);
         card2 = player.getDeck().get(1);
         card3 = player.getDeck().get(2);
@@ -148,7 +140,7 @@ public class Manager {
             return;
         elixirUpdater.decrease(chosen.getCost());
         // valid choosing
-
+        updateCardPane(card);
         System.out.println(chosen.getType().toString() + " card");
         Message msg = new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType().toString() + "," + tileX + "," + tileY);
         player.getSender().sendMsg(msg);
@@ -169,6 +161,34 @@ public class Manager {
 
         return null;
     }
+
+    public void updateCardPane(String card)
+    {
+        if (card.equals("card1"))
+        {
+            card1 = nextCard;
+            sceneController.getCard1().setImage(card1.getCardImage());
+        }
+        else if (card.equals("card2"))
+        {
+            card2 = nextCard;
+            sceneController.getCard2().setImage(card2.getCardImage());
+        }
+        else if (card.equals("card3"))
+        {
+            card3 = nextCard;
+            sceneController.getCard3().setImage(card3.getCardImage());
+        }
+        else {
+            card4 = nextCard;
+            sceneController.getCard4().setImage(card4.getCardImage());
+        }
+        Random random = new Random();
+        nextCard = player.getDeck().get(random.nextInt(player.getDeck().size()));
+        sceneController.getNextCard().setImage(nextCard.getCardImage());
+    }
+
+
 
     public void updateElixir(int elixir){
         this.elixir = elixir;
