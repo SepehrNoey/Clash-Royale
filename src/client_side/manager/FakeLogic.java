@@ -4,13 +4,13 @@ import client_side.view.render.Render;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import shared.enums.MessageType;
+import shared.enums.State;
 import shared.model.Board;
 import shared.model.Message;
 import shared.model.player.Player;
+import shared.model.troops.Tower;
 import shared.model.troops.Troop;
-import shared.model.troops.card.BuildingCard;
 import shared.model.troops.card.Card;
-
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class FakeLogic implements Runnable{
@@ -57,43 +57,27 @@ public class FakeLogic implements Runnable{
         } else {
             chosen.setCoordinates(new Point2D(tileX, tileY));
             board.addTroop(chosen);
-            chosen.updateState(board, null, false);
             cardUsedNum++;
             chosen.setId(cardUsedNum);
+            chosen.updateState(board, null, false);
             chosen.setRender(render);
             render.addForRender(chosen,false);
             for (int i = 0; i < chosen.getCount() - 1; i++) {
                 Card newCard = null;
-                if (board.isValidAddress(chosen, tileX - 1, tileY)) {
+                if (board.isValidAddress(chosen, tileX - 1, tileY))
                     newCard = (Card) Troop.makeTroop(true, chosen.getType().toString(), chosen.getLevel(), new Point2D(tileX - 1, tileY), chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    board.addTroop(newCard);
-                    newCard.updateState(board, null, false);
-                } else if (board.isValidAddress(chosen, tileX + 1, tileY))//not valid
-                {
+                else if (board.isValidAddress(chosen, tileX + 1, tileY))//not valid
                     newCard = (Card) Troop.makeTroop(true, chosen.getType().toString(), chosen.getLevel(), new Point2D(tileX + 1, tileY), chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    board.addTroop(newCard);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    newCard.updateState(board, null, false);
-                } else if (board.isValidAddress(chosen, tileX, tileY - 1)) {
+                else if (board.isValidAddress(chosen, tileX, tileY - 1))
                     newCard = (Card) Troop.makeTroop(true, chosen.getType().toString(), chosen.getLevel(), new Point2D(tileX, tileY - 1), chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    board.addTroop(newCard);
-                    newCard.updateState(board, null, false);
-                } else if (board.isValidAddress(chosen, tileX, tileY + 1)) {
+                else if (board.isValidAddress(chosen, tileX, tileY + 1))
                     newCard = (Card) Troop.makeTroop(true, chosen.getType().toString(), chosen.getLevel(), new Point2D(tileX, tileY + 1), chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    board.addTroop(newCard);
-                    newCard.updateState(board, null, false);
-                }
+
+                cardUsedNum++;
+                newCard.setInGameInbox(inGameInbox);
+                board.addTroop(newCard);
+                newCard.setId(cardUsedNum);
+                newCard.updateState(board, null, false);
                 newCard.setRender(render);
                 render.addForRender(newCard , false);
             }
@@ -103,6 +87,7 @@ public class FakeLogic implements Runnable{
     public void addEvent(Message newEvent){
         try {
             inGameInbox.put(newEvent);
+            System.out.println("3) in addEvent in fakeLogic");
         }catch (InterruptedException e)
         {
             e.printStackTrace();
@@ -130,36 +115,45 @@ public class FakeLogic implements Runnable{
 
     @Override
     public void run() {
-        Message event = null;
-        try {
-            event = inGameInbox.take();
-            if (event.getType() == MessageType.PICKED_CARD)
-            {
-                addAndInitCard(event);
-            }
-            else if (event.getType() == MessageType.CHARACTER_DIED)
-            {
-                Troop died = board.getTroopByID(event.getContent());
-                if (died == null)
-                    System.out.println("Couldn't find the died troop in logic. Shouldn't happen . Error!");
-                else {
-                    board.destroy(died);
-                    if (died instanceof Card)
-                        render.delete((Card) died);
-                    for (Troop troop :board.getAddedTroops())
-                    {
-                        troop.updateState(board,died,true);
+        while (true)
+        {
+            Message event = null;
+            try {
+                event = inGameInbox.take();
+                System.out.println("4) got from inGameInbox in fakeLogic");
+                if (event.getType() == MessageType.PICKED_CARD)
+                {
+                    addAndInitCard(event);
+                }
+                else if (event.getType() == MessageType.CHARACTER_DIED)
+                {
+                    Troop died = board.getTroopByID(event.getContent());
+                    if (died == null)
+                        System.out.println("Couldn't find the died troop in logic. Shouldn't happen . Error!");
+                    else {
+                        System.out.println("Got died message in fakeLogic");
+                        died.setState(State.DEAD);
+                        died.setTargetToDoAct(null);
+                        died.getExec().shutdownNow();
+                        board.destroy(died);
+                        if (died instanceof Tower)
+                            render.delete((Tower) died);
+                        for (Troop troop :board.getAddedTroops())
+                        {
+                            troop.updateState(board,died,true);
+                        }
                     }
                 }
+                else { // GAME_RESULT message
+//                    manager.getExecutor().shutdownNow();
+                    Message finalEvent = event;
+                    Platform.runLater(() -> render.gameFinishedMsg(finalEvent)); // handle later
+                    break;
+                }
+            }catch (InterruptedException e)
+            {
+                e.printStackTrace();
             }
-            else { // GAME_RESULT message
-                manager.getExecutor().shutdownNow();
-                Message finalEvent = event;
-                Platform.runLater(() -> render.gameFinishedMsg(finalEvent)); // handle later
-            }
-        }catch (InterruptedException e)
-        {
-            e.printStackTrace();
         }
     }
 }

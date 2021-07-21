@@ -8,9 +8,9 @@ import shared.enums.State;
 import shared.enums.TargetTypes;
 import shared.model.Board;
 import shared.model.troops.Troop;
-
 import java.util.ArrayList;
-import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class BuildingCard extends Card {
     private Image[] dieFrames; // explosion frames for buildings
@@ -104,7 +104,8 @@ public class BuildingCard extends Card {
         {
             if (getTargetToDoAct() != null && changedTroop.getId().equals(getTargetToDoAct().getId()))
             {
-                getActTimer().cancel();
+                getExec().shutdownNow();
+                setExec(Executors.newScheduledThreadPool(1));
                 setTargetToDoAct(null);
                 setState(State.STOP);
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
@@ -112,8 +113,7 @@ public class BuildingCard extends Card {
                 {
                     setState(State.ATTACK);
                     setTargetToDoAct(nearEnemies.get(0));
-                    setActTimer(new Timer());
-                    getActTimer().schedule(this,0 , (long) (1000 * hitSpeed));
+                    getExec().scheduleAtFixedRate(this,0 , (long) (1000 * hitSpeed), TimeUnit.MILLISECONDS);
                     // no direction for Building cards - state can be recognized by targetToDoAct
                 }
             }
@@ -126,8 +126,7 @@ public class BuildingCard extends Card {
                     {
                         setState(State.ATTACK);
                         setTargetToDoAct(nearEnemies.get(0));
-                        setActTimer(new Timer());
-                        getActTimer().schedule(this,0,(long) (1000 * hitSpeed));
+                        getExec().scheduleAtFixedRate(this,0,(long) (1000 * hitSpeed),TimeUnit.MILLISECONDS);
                     }
                 }
             }
@@ -139,8 +138,7 @@ public class BuildingCard extends Card {
                 if (nearEnemies.size() > 0)
                 {
                     setState(State.ATTACK);
-                    setActTimer(new Timer());
-                    getActTimer().schedule(this,0 ,(long) (1000 * hitSpeed));
+                    getExec().scheduleAtFixedRate(this,0 ,(long) (1000 * hitSpeed),TimeUnit.MILLISECONDS);
                     setTargetToDoAct(nearEnemies.get(0));
                 }
             }

@@ -1,19 +1,22 @@
 package shared.model.troops.timerTasks;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
+import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 import shared.enums.State;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 import shared.model.troops.card.SoldierCard;
-
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class SoldierAnimMaker extends AnimationMaker{
     private SoldierCard soldierCard;
     private ArrayBlockingQueue<Card> coordinateUpdateQueue;
+    private int num;
 
     public SoldierAnimMaker(Troop troop, Pane pane, ArrayBlockingQueue<Card> coordinateUpdateQueue){
         super(troop, pane);
@@ -42,11 +45,11 @@ public class SoldierAnimMaker extends AnimationMaker{
                     else {
                         setXYChange();
                         setLastPoint(getLastPoint().add(getxToChange(), getyToChange()));
-                        getImageView().setImage(soldierCard.getWalkFrm(t,0.100));
+                        getImageView().setImage(soldierCard.getWalkFrm(t,0.300 / troop.getMovingSpeed().getValue()));
                         getImageView().setTranslateX(getLastPoint().getX() + getxToChange());
                         getImageView().setTranslateY(getLastPoint().getY() + getyToChange());
-                        if ((int)getLastPoint().getX() != (int)soldierCard.getCoordinates().getX() ||
-                                (int)getLastPoint().getY() != (int)soldierCard.getCoordinates().getY())
+                        if ((int)(getLastPoint().getX() / 30) != (int)soldierCard.getCoordinates().getX() ||
+                                (int)(getLastPoint().getY() / 30) != (int)soldierCard.getCoordinates().getY())
                         {
                             soldierCard.setCoordinates(new Point2D((int)(getLastPoint().getX() / 30) , (int)(getLastPoint().getY() / 30))); // addressing in tiles
 
@@ -83,6 +86,16 @@ public class SoldierAnimMaker extends AnimationMaker{
                         // may need to communicate
 
                     }
+                }
+                else { // DEAD STATE
+                    FadeTransition fadeTransition = new FadeTransition(Duration.seconds(2),getImageView());
+                    fadeTransition.setFromValue(1.0);
+                    fadeTransition.setToValue(0);
+                    fadeTransition.setOnFinished((ActionEvent event) ->{
+                        pane.getChildren().remove(getImageView());
+                        this.stop();
+                    });
+                    fadeTransition.play();
                 }
             }
         });

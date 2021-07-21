@@ -31,7 +31,7 @@ public class GameLoop {
         if (bot != null)
             this.bot = bot;
         this.inGameInbox = inGameInbox;
-        logic = new Logic(inGameInbox, new ArrayBlockingQueue<>(50) ,gameMode,players.get(0) , bot);
+        logic = new Logic(inGameInbox, new ArrayBlockingQueue<>(50) ,gameMode,players.get(0) , bot , executor);
         this.executor = executor;
         timeEnded = new TimerTask() {
             @Override
@@ -49,8 +49,6 @@ public class GameLoop {
             executor.execute(bot);
         }
         executor.execute(logic.getBoard());
-
-
         executor.execute(logic);
         timer.schedule(timeEnded , 3 * 60 * 1000); // timer for 3 minutes
         Message event = null;
@@ -82,7 +80,7 @@ public class GameLoop {
      * @param newEvent the newEvent
      */
     private void notifyPlayers(Message newEvent){
-        if (bot != null)
+        if ((bot != null && !newEvent.getSender().contains("bot")) || (bot!= null && (newEvent.getType() == MessageType.GAME_RESULT || newEvent.getType() == MessageType.CHARACTER_DIED)  ) )
         {
             try {
                 bot.getIncomingEvents().put(newEvent);
@@ -94,7 +92,16 @@ public class GameLoop {
         }
         for (Player ply:players)
         {
-            ply.getSender().sendMsg(newEvent);
+            if (newEvent.getType() == MessageType.GAME_RESULT || newEvent.getType() == MessageType.CHARACTER_DIED)
+            {
+                System.out.println("sent " + newEvent.getType() + "for " + ply.getName());
+                ply.getSender().sendMsg(newEvent);
+            }
+            else if (!ply.getName().equals(newEvent.getSender()))
+            {
+                ply.getSender().sendMsg(newEvent);
+            }
         }
+        System.out.println("end of notify players of gameLoop");
     }
 }

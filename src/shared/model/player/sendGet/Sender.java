@@ -15,6 +15,7 @@ public class Sender {
     public void sendMsg(Message msg) {
         try {
             this.outObj.writeObject(msg);
+            System.out.println("2) in sendMsg");
         } catch (IOException var3) {
             System.out.println("Can't send message in Sender.");
         }

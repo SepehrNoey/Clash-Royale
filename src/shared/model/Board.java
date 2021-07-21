@@ -25,7 +25,6 @@ public class Board implements Runnable {
     private String botName;
     private int humanLevel;
     private ArrayBlockingQueue<Card> coordinateUpdateQueue;
-    private ArrayBlockingQueue<Troop> renderQueue;
 
     public Board(BoardTypes type , boolean isServerSide , String humanPlayer , int humanLevel , String botName){
         this.type = type;
@@ -294,7 +293,7 @@ public class Board implements Runnable {
         for (Troop troop:addedTroops)  // checking a circle with radius sqrt(72)
         {
             if (Math.pow(x - troop.getCoordinates().getX() , 2) + Math.pow(y - troop.getCoordinates().getY() , 2) <= 72
-        && !(troop instanceof Tower ) && !card.getId().equals(troop.getId()))
+        && !(troop instanceof Tower ) && !card.getOwner().equals(troop.getOwner()))
             {
                 return (Card) troop;
             }
@@ -329,9 +328,9 @@ public class Board implements Runnable {
             return "right";
         else if ((int)card.getCoordinates().getX() >= 5 && (int)card.getCoordinates().getX() <= 10)
             return "left";
-        else if ((int)card.getCoordinates().getX() >= 10 && (int)card.getCoordinates().getX() <= 16)
+        else if ((int)card.getCoordinates().getX() >= 11 && (int)card.getCoordinates().getX() <= 16)
             return "right";
-        else if ((int)card.getCoordinates().getX() >= 16)
+        else if ((int)card.getCoordinates().getX() > 16)
             return "left";
         return null;
     }
@@ -370,23 +369,11 @@ public class Board implements Runnable {
     }
 
     public void destroy(Troop destroyed){
+        addedTroops.remove(destroyed);
         if (destroyed.getId().contains("bot") && destroyed.getId().contains("left"))
             isLeftUpAreaAllowed = true;
         else if (destroyed.getId().contains("bot") && destroyed.getId().contains("right"))
             isRightUpAreaAllowed = true;
-        else
-            addedTroops.remove(destroyed);
-
-        if (destroyed instanceof Card)
-        {
-            try {
-                renderQueue.put((Card) destroyed);
-            }catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public ArrayList<Tower> getOfTowers(String owner)
@@ -396,10 +383,5 @@ public class Board implements Runnable {
             if (troop.getOwner().equals(owner) && troop instanceof Tower)
                 towers.add((Tower)troop);
         return towers;
-    }
-
-
-    public void setRenderQueue(ArrayBlockingQueue<Troop> renderQueue) {
-        this.renderQueue = renderQueue;
     }
 }

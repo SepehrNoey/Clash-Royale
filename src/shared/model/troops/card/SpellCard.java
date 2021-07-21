@@ -18,7 +18,6 @@ public class SpellCard extends Card{
     private int speedBoost;
     private int hitSpeedBoost;
     private boolean reducedDmg; // reduced damage to crown towers
-    private Timer walkTimer;
     private CoordinateUpdater walkTask;
     private String direction; // will be used for rendering
     private int hp = 10; // fake
@@ -59,10 +58,13 @@ public class SpellCard extends Card{
         else
         {
             ArrayList<Troop> inRange = board.getNearEnemies(this);
-            int each = this.getDamage() / inRange.size();
-            for (Troop troop:inRange)
+            if (inRange.size() != 0)
             {
-                troop.getBeingHit(each);
+                int each = this.getDamage() / inRange.size();
+                for (Troop troop:inRange)
+                {
+                    troop.getBeingHit(each);
+                }
             }
         }
     }
@@ -125,23 +127,6 @@ public class SpellCard extends Card{
         }
         return Math.pow(troop.getCoordinates().getX() - this.getCoordinates().getX(), 2) +
             Math.pow(troop.getCoordinates().getY() - this.getCoordinates().getY(), 2) <= getRange();
-    }
-
-
-    /**
-     * setter
-     * @param walkTimer timer for walking
-     */
-    public void setWalkTimer(Timer walkTimer) {
-        this.walkTimer = walkTimer;
-    }
-
-    /**
-     * setter
-     * @param walkTask task of walking (coordinate updater)
-     */
-    public void setWalkTask(CoordinateUpdater walkTask) {
-        this.walkTask = walkTask;
     }
 
     /**
@@ -234,15 +219,6 @@ public class SpellCard extends Card{
     public void setMovingSpeed(double newSpeed) {
         // fake
     }
-
-    /**
-     * getter
-     * @return walking timer
-     */
-    public Timer getWalkTimer() {
-        return walkTimer;
-    }
-
     public Point2D getDestination() {
         return destination;
     }

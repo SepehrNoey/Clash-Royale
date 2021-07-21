@@ -1,5 +1,6 @@
 package server_side.manager;
 
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import server_side.database.DBUtil;
 import server_side.model.Bot;
@@ -11,8 +12,12 @@ import shared.model.player.Player;
 import shared.model.troops.Tower;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
+import shared.model.troops.card.SoldierCard;
+import shared.model.troops.timerTasks.CoordinateUpdater;
+
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Timer;
+import java.util.concurrent.*;
 
 public class Logic implements Runnable {
     private ArrayBlockingQueue<Message> inGameInbox; // for adding new events
@@ -23,10 +28,11 @@ public class Logic implements Runnable {
     private Bot botPlayer;
     private int cardUsedNum;
     private String winner;
+    private ExecutorService executor;
 
-
-    public Logic(ArrayBlockingQueue<Message> inGameInbox , ArrayBlockingQueue<Message> toCheckEvents ,String gameMode,Player humanPlayer , Bot botPlayer)
+    public Logic(ArrayBlockingQueue<Message> inGameInbox , ArrayBlockingQueue<Message> toCheckEvents , String gameMode, Player humanPlayer , Bot botPlayer , ExecutorService executor)
     {
+        this.executor = executor;
         cardUsedNum = 0;
         this.humanPlayer = humanPlayer;
         this.botPlayer = botPlayer;
@@ -79,6 +85,7 @@ public class Logic implements Runnable {
             humanPlayer.updateProperty(200);
         }
         try {
+            System.out.println("in winner update going to send game result...");
             inGameInbox.put(new Message(MessageType.GAME_RESULT, "Server",botPlayer.getName() + "," + humanPlayer.getLevel() + "," + humanPlayer.getXp()));
         }catch (InterruptedException e)
         {
@@ -112,6 +119,7 @@ public class Logic implements Runnable {
                         event = toCheckEvents.take();
                         if (event.getType() == MessageType.PICKED_CARD && !isFinished(false))
                         {
+                            System.out.println("Got picked card");
                             this.firstTimeHandle(event);
                         }
                         else if (event.getType() == MessageType.CHARACTER_DIED && !isFinished(false))
@@ -174,52 +182,54 @@ public class Logic implements Runnable {
             chosen.setId(cardUsedNum);
             board.addTroop(chosen);
             chosen.updateState(board,null,false);
+            if (chosen instanceof SoldierCard)
+            {
+                ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+                CoordinateUpdater coordinateUpdater = new CoordinateUpdater((SoldierCard) chosen , getBoard().getCoordinateUpdateQueue(),scheduledExecutorService);
+                scheduledExecutorService.scheduleAtFixedRate(coordinateUpdater,0,16,TimeUnit.MILLISECONDS);
+            }
         }
         else
         { // it may need to be changed for some special cases - it is used for adding troops that their count is more than 1 .
             chosen.setCoordinates(new Point2D(tileX, tileY));
             board.addTroop(chosen);
-            chosen.updateState(board,null,false);
             cardUsedNum++;
             chosen.setId(cardUsedNum);
+            chosen.updateState(board,null,false);
+            // just barbarian and archer are more than one troop
+
+            if (chosen instanceof SoldierCard)
+            {
+                ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+                CoordinateUpdater coordinateUpdater = new CoordinateUpdater((SoldierCard) chosen , getBoard().getCoordinateUpdateQueue(),scheduledExecutorService);
+                scheduledExecutorService.scheduleAtFixedRate(coordinateUpdater,0,16,TimeUnit.MILLISECONDS);
+            }
+
             for (int i = 0 ; i < chosen.getCount() - 1 ; i++)
             {
+                Card newCard = null;
                 if (board.isValidAddress(chosen , tileX - 1 , tileY))
-                {
-                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX - 1 , tileY) , chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    board.addTroop(newCard);
-                    newCard.updateState(board,null,false);
-                }
+
+                    newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX - 1 , tileY) , chosen.getOwner());
+
                 else if (board.isValidAddress(chosen,tileX + 1 , tileY))//not valid
-                {
-                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX + 1 , tileY) , chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    board.addTroop(newCard);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    newCard.updateState(board,null,false);
-                }
+                    newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX + 1 , tileY) , chosen.getOwner());
                 else if (board.isValidAddress(chosen,tileX , tileY -1))
-                {
-                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX , tileY - 1) , chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    board.addTroop(newCard);
-                    newCard.updateState(board,null,false);
-                }
+                    newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX , tileY - 1) , chosen.getOwner());
                 else if (board.isValidAddress(chosen,tileX , tileY  + 1))
+                    newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX , tileY + 1) , chosen.getOwner());
+                newCard.setInGameInbox(inGameInbox);
+                cardUsedNum++;
+                newCard.setId(cardUsedNum);
+                board.addTroop(newCard);
+                newCard.updateState(board,null,false);
+                if (newCard instanceof SoldierCard)
                 {
-                    Card newCard = (Card) Troop.makeTroop(true,chosen.getType().toString(),chosen.getLevel(),new Point2D(tileX , tileY + 1) , chosen.getOwner());
-                    newCard.setInGameInbox(inGameInbox);
-                    cardUsedNum++;
-                    newCard.setId(cardUsedNum);
-                    board.addTroop(newCard);
-                    newCard.updateState(board,null,false);
+                    ScheduledExecutorService scheduledExecutorService1 = Executors.newScheduledThreadPool(1);
+                    CoordinateUpdater coordinateUpdater1 = new CoordinateUpdater((SoldierCard) newCard, board.getCoordinateUpdateQueue(),scheduledExecutorService1);
+                    scheduledExecutorService1.scheduleAtFixedRate(coordinateUpdater1,0,16,TimeUnit.MILLISECONDS);
                 }
+
             }
         }
     }

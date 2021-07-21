@@ -10,7 +10,8 @@ import shared.model.Board;
 import shared.model.troops.Troop;
 import shared.model.troops.timerTasks.CoordinateUpdater;
 import java.util.ArrayList;
-import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class SoldierCard extends Card{
     private SpeedTypes movingSpeed; // can be other types
@@ -19,7 +20,6 @@ public class SoldierCard extends Card{
     private Image[] walkFrames;
     private Image[] dieFrames;
     private String direction; // will be used for rendering
-    private Timer walkTimer;
     private CoordinateUpdater walkTask;
     private Board board;
 
@@ -60,7 +60,7 @@ public class SoldierCard extends Card{
             else {
                 this.getTargetToDoAct().getBeingHit(this.getDamage());
             }
-            if (getType() == CardTypes.ARCHER || getType() == CardTypes.BABY_DRAGON || getType() == CardTypes.WIZARD)
+            if ((getType() == CardTypes.ARCHER || getType() == CardTypes.BABY_DRAGON || getType() == CardTypes.WIZARD) && !isServerSide())
                 getRender().addForRender(this,true);
         }
 
@@ -123,8 +123,8 @@ public class SoldierCard extends Card{
         }
         else{
             Card enemyAround = board.isEnemyAround(this,(int)getCoordinates().getX() , (int)getCoordinates().getY());
-            if (enemyAround != null && getTarget() == TargetTypes.AIR_GROUND || (getTarget() == TargetTypes.GROUND && !(enemyAround instanceof SpellCard
-                    || enemyAround.getType() == CardTypes.BABY_DRAGON) ) ){
+            if ((enemyAround != null) && ((getTarget() == TargetTypes.AIR_GROUND) || ((getTarget() == TargetTypes.GROUND) && (!(enemyAround instanceof SpellCard)
+                    || enemyAround.getType() == CardTypes.BABY_DRAGON)))){
                 int xEnemy = (int)enemyAround.getCoordinates().getX();
                 int yEnemy = (int)enemyAround.getCoordinates().getY();
                 int thisX =(int) getCoordinates().getX();
@@ -216,13 +216,12 @@ public class SoldierCard extends Card{
         this.board = board;
         if (direction.equals("")) // first time using
         {
+            System.out.println("in first time updating state");
             ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
             if (nearEnemies.size() > 0)
             {
                 setTargetToDoAct(nearEnemies.get(0));
-                Timer atcTim = new Timer();
-                setActTimer(atcTim);
-                atcTim.schedule(this , 0 , (long) (1000 * getHitSpeed()));
+                getExec().scheduleAtFixedRate(this , 0 , (long) (1000 * getHitSpeed()) , TimeUnit.MILLISECONDS);
                 setState(State.ATTACK);
                 direction = "attack"; // redundant
             }
@@ -235,14 +234,14 @@ public class SoldierCard extends Card{
         {
             if (getTargetToDoAct() != null && getTargetToDoAct().getId().equals(changedTroop.getId()))
             {
-                getActTimer().cancel();
+                getExec().shutdownNow();
+                setExec(Executors.newScheduledThreadPool(1));
                 setTargetToDoAct(null);
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
                 if (nearEnemies.size() > 0) // still enemy around here to attack
                 {
                     setTargetToDoAct(nearEnemies.get(0));
-                    setActTimer(new Timer());
-                    getActTimer().schedule(this,0,(long) (1000 * getHitSpeed()));
+                    getExec().scheduleAtFixedRate(this,0,(long) (1000 * getHitSpeed()),TimeUnit.MILLISECONDS);
                     direction = "attack";
                     setState(State.ATTACK);
                 }
@@ -263,8 +262,7 @@ public class SoldierCard extends Card{
 //                    setWalkTask(null);
                     setState(State.ATTACK);
                     direction = "attack";
-                    setActTimer(new Timer());
-                    getActTimer().schedule(this,0,(long) (1000 * getHitSpeed()));
+                    getExec().scheduleAtFixedRate(this,0,(long) (1000 * getHitSpeed()),TimeUnit.MILLISECONDS);
                     setTargetToDoAct(nearEnemies.get(0));
                 }
                 else
@@ -299,25 +297,10 @@ public class SoldierCard extends Card{
 
     /**
      * getter
-     * @return timer for walking
-     */
-    public Timer getWalkTimer() {
-        return walkTimer;
-    }
-
-    /**
-     * getter
      * @return board
      */
     public Board getBoard() {
         return board;
     }
 
-    /**
-     * setter
-     * @param walkTimer the new walkTimer
-     */
-    public void setWalkTimer(Timer walkTimer) {
-        this.walkTimer = walkTimer;
-    }
 }

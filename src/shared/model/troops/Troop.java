@@ -13,9 +13,11 @@ import shared.model.troops.card.SpellCard;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 
-public abstract class Troop extends TimerTask{
+public abstract class Troop implements Runnable{
     private int damage; // except rage card
     private int level;
     private Image[] attackFrames; // all troops have attack frames
@@ -26,13 +28,15 @@ public abstract class Troop extends TimerTask{
     private Point2D coordinates;
     private String owner;
     private Troop targetToDoAct; // the point where target is - if this target is null , then it means there is no target - can be used for rendering
-    private Timer actTimer;
     private ArrayBlockingQueue<Message> inGameInbox;
     private String id; // an special distinct id for each troop
     private State state;
     private boolean isServerSide;
     private Render render;
     private String shotPath;
+    private ScheduledExecutorService exec;
+
+
 
     public Troop(boolean isServerSide,int damage , int level , String attackFrmPath , int attackFrmNum , int width ,
                  int height , double range , TargetTypes target , Point2D coordinates , String owner,String shotPath)
@@ -53,6 +57,7 @@ public abstract class Troop extends TimerTask{
         this.owner = owner;
         this.shotPath = shotPath;
         state = State.STOP;
+        this.exec = Executors.newScheduledThreadPool(1);
     }
 
 
@@ -161,13 +166,13 @@ public abstract class Troop extends TimerTask{
         {
             return new SoldierCard(isServerSide,typeParam,4,level == 1 ? 100 : level == 2 ? 110 : level == 3? 121 : level == 4 ? 133 : 146
                     ,level,"client_side/view/pics/heli.png","client_side/view/pics/heli_walk",
-                    2,100,100,3, TargetTypes.AIR_GROUND,1,true,point2D,owner, SpeedTypes.FAST,1.8
+                    2,50,107,3, TargetTypes.AIR_GROUND,1,true,point2D,owner, SpeedTypes.FAST,1.8
                     ,level == 1 ? 800 : level == 2 ? 880 : level == 3 ? 968 : level == 4 ? 1064 : 1168,"client_side/view/pics/heli_walk",2,"",0,"client_side/view/pics/archer_shot.png");
         }
         else if (typeParam == CardTypes.WIZARD)
         {
             return new SoldierCard(isServerSide,CardTypes.WIZARD,5,level == 1 ? 130 : level == 2 ? 143 : level == 3? 157 : level == 4 ? 172 : 189
-                    ,level,"client_side/view/pics/wizard.png","client_side/view/pics/wizard_shot",
+                    ,level,"client_side/view/pics/wizard.png","client_side/view/pics/wizard_walk",
                     1,30,30,5, TargetTypes.AIR_GROUND,1,true,point2D,owner,SpeedTypes.MEDIUM,1.7
                     ,level == 1 ? 340 : level == 2 ? 374 : level == 3 ? 411 : level == 4 ? 452 : 496,"client_side/view/pics/wizard_walk",1,"",0,"client_side/view/pics/wizard_shot0.png");
         }
@@ -225,7 +230,7 @@ public abstract class Troop extends TimerTask{
             return new BuildingCard(isServerSide,typeParam,5,level == 1 ? 400 : level == 2 ? 440 : level == 3? 484 : level == 4 ? 532 : 584
                     ,level,"client_side/view/pics/inferno.png","client_side/view/pics/inferno_body",
                     1,45,45,6,TargetTypes.AIR_GROUND,1,false,point2D,owner,"",0,
-                    0.4,40,level == 1 ? 800 : level == 2 ? 880 : level == 3? 968 : level == 4 ? 1064 : 1168,null);
+                    0.4,40,level == 1 ? 800 : level == 2 ? 880 : level == 3? 968 : level == 4 ? 1064 : 1168,"client_side/view/pics/inferno_shot.png");
         }
         else if (towerType == TowerTypes.KING_TOWER)
         {
@@ -274,21 +279,6 @@ public abstract class Troop extends TimerTask{
         return targetToDoAct;
     }
 
-    /**
-     * setter
-     * @param actTimer timer for doing act
-     */
-    public void setActTimer(Timer actTimer) {
-        this.actTimer = actTimer;
-    }
-
-    /**
-     * getter
-     * @return timer of acting
-     */
-    public Timer getActTimer() {
-        return actTimer;
-    }
 
     public abstract void setHp(int damage);
     public abstract int getHp();
@@ -296,18 +286,23 @@ public abstract class Troop extends TimerTask{
     public void getBeingHit(int damage) // attention ! deleting from board happens in other methods ...
     {
         this.setHp(damage);
-        if (getHp() == 0 && isServerSide) // sending die message to logic or board
+        if (getHp() == 0) // sending die message to logic or board
         {
-            setState(State.DEAD); // for rendering
-            try {
-                inGameInbox.put(new Message(MessageType.CHARACTER_DIED ,getOwner(),getId())); // must change here!!!!
-                actTimer.cancel();
-                this.setTargetToDoAct(null);
-            }
-            catch (InterruptedException e)
+            System.out.println("hp = 0");
+            if (isServerSide)
             {
-                System.out.println( this.getOwner()+ " interrupted while sending character died message.");
-                e.printStackTrace();
+                try {
+                    inGameInbox.put(new Message(MessageType.CHARACTER_DIED ,getOwner(),getId()));
+                    System.out.println("msg died- in serverSide");
+                    getExec().shutdownNow();
+                    this.setTargetToDoAct(null);
+                    setState(State.DEAD); // for rendering
+                }
+                catch (InterruptedException e)
+                {
+                    System.out.println( this.getOwner()+ " interrupted while sending character died message.");
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -399,5 +394,13 @@ public abstract class Troop extends TimerTask{
 
     public String getShotPath() {
         return shotPath;
+    }
+
+    public ScheduledExecutorService getExec() {
+        return exec;
+    }
+
+    public void setExec(ScheduledExecutorService exec) {
+        this.exec = exec;
     }
 }

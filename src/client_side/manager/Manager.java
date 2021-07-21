@@ -4,23 +4,16 @@ import client_side.controller.GameSceneController;
 import client_side.starter.Starter;
 import client_side.view.render.*;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
 import shared.enums.BoardTypes;
 import shared.enums.MessageType;
-import shared.enums.TowerTypes;
 import shared.model.Board;
 import shared.model.Message;
 import shared.model.player.Player;
-import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
-
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 public class Manager {
@@ -44,6 +37,7 @@ public class Manager {
     private String botName;
     private FakeLogic fakeLogic;
     private ExecutorService executor;
+    private int cardIndex;
 
     /**
      * constructor and initializer
@@ -52,6 +46,7 @@ public class Manager {
      * @param scene scene of the game
      */
     public Manager(Player player, String gameMode,String botName, Scene scene , ExecutorService executor){
+        this.cardIndex = 3;
         this.executor = executor;
         this.scene = scene;
         this.botName = botName;
@@ -136,7 +131,7 @@ public class Manager {
         elixirUpdater.decrease(chosen.getCost());
         // valid choosing
         updateCardPane(card);
-        System.out.println(chosen.getType().toString() + " card");
+        System.out.println("1 ) in cardDroppingReq");
         Message msg = new Message(MessageType.PICKED_CARD , player.getName() , chosen.getType().toString() + "," + tileX + "," + tileY);
         player.getSender().sendMsg(msg);
         fakeLogic.addEvent(msg);
@@ -178,8 +173,7 @@ public class Manager {
             card4 = nextCard;
             sceneController.getCard4().setImage(card4.getCardImage());
         }
-        Random random = new Random();
-        nextCard = player.getDeck().get(random.nextInt(player.getDeck().size()));
+        nextCard = player.getDeck().get((++cardIndex) % 8);
         sceneController.getNextCard().setImage(nextCard.getCardImage());
     }
 
