@@ -86,6 +86,7 @@ public class Logic implements Runnable {
         }
         DBUtil dbUtil = new DBUtil();
         dbUtil.updateLevelXp(humanPlayer);
+        dbUtil.updateHistory(humanPlayer, botPlayer.getName(), winner);
     }
 
 

@@ -187,4 +187,21 @@ public class DBUtil {
         }
     }
 
+    public void updateHistory(Player player, String botName, String winner)
+    {
+        String tableName = player.getName() +"_history";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ");
+        sb.append(tableName);
+        sb.append(" (opponent,winner) VALUES ('");
+        sb.append(botName);sb.append("','");
+        sb.append(winner);sb.append("')");
+        try {
+            statement.executeUpdate(sb.toString());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
 }
