@@ -69,11 +69,14 @@ public class Manager {
         sceneController = loader.getController(); // shouldn't be null !
         sceneController.setManager(this); // connecting manager and fxmlController
         board = new Board(gameMode.equals("2v2") ? BoardTypes.FOUR_PLAYERS : BoardTypes.TWO_PLAYERS , false, player.getName() ,player.getLevel(), botName);
-        board.addTowers(false,board.getType() , player.getName() , player.getSharedInbox());
         render = new Render(player.getName() , board , sceneController); // the only messages that will be sent to render must be inGameMessages!!!
+        board.addTowers(false,board.getType() , player.getName() , player.getSharedInbox(),render);
         scene.setRoot(gameRoot);
         Starter.stage.setWidth(814);
+    }
 
+
+    public void init(){
         // for bot mode
         try {
             Message msg = player.getSharedInbox().take(); // here just for bot implemented
@@ -109,16 +112,8 @@ public class Manager {
         sceneController.getNextCard().setImage(nextCard.getCardImage());
         fakeLogic = new FakeLogic(player,botName , gameMode,this,board,render);
         this.executor.execute(fakeLogic);
-        this.executor.execute(render);
+//        this.executor.execute(render);
         this.executor.execute(board);
-    }
-
-
-    public void start(){
-
-
-
-
     }
 
     private String getPlayerName(int index)

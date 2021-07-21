@@ -1,5 +1,6 @@
 package shared.model.troops;
 
+import client_side.view.render.Render;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import shared.enums.*;
@@ -28,10 +29,15 @@ public abstract class Troop extends TimerTask{
     private Timer actTimer;
     private ArrayBlockingQueue<Message> inGameInbox;
     private String id; // an special distinct id for each troop
+    private State state;
+    private boolean isServerSide;
+    private Render render;
+    private String shotPath;
 
     public Troop(boolean isServerSide,int damage , int level , String attackFrmPath , int attackFrmNum , int width ,
-                 int height , double range , TargetTypes target , Point2D coordinates , String owner)
+                 int height , double range , TargetTypes target , Point2D coordinates , String owner,String shotPath)
     {
+        this.isServerSide = isServerSide;
         this.damage = damage;
         this.level = level;
         attackFrames = new Image[attackFrmNum];
@@ -45,11 +51,14 @@ public abstract class Troop extends TimerTask{
         this.target = target;
         this.coordinates = coordinates;
         this.owner = owner;
+        this.shotPath = shotPath;
+        state = State.STOP;
     }
 
 
-    public Image getAttackFrm(){
-        return attackFrames[0];
+    public Image getAttackFrm(double time , double duration){
+        int index = (int)((time % (attackFrames.length * duration)) / duration);
+        return attackFrames[index];
     }
 
     /**
@@ -139,49 +148,49 @@ public abstract class Troop extends TimerTask{
             return new SoldierCard(isServerSide,typeParam,5,level == 1 ? 75 : level == 2 ? 82 : level == 3? 90 : level == 4 ? 99 : 109
                     ,level,"client_side/view/pics/babarian.png","client_side/view/pics/barbarian_attack",
                     7,40,40,0, TargetTypes.GROUND,4,false,point2D,owner, SpeedTypes.MEDIUM,1.5
-                    ,level == 1 ? 300 : level == 2 ? 330 : level == 3 ? 363 : level == 4 ? 438 : 480,"client_side/view/pics/barbarian_walk",6,"",0);
+                    ,level == 1 ? 300 : level == 2 ? 330 : level == 3 ? 363 : level == 4 ? 438 : 480,"client_side/view/pics/barbarian_walk",6,"",0,null);
         }
         else if (typeParam == CardTypes.ARCHER)
         {
             return new SoldierCard(isServerSide,typeParam,3,level == 1 ? 33 : level == 2 ? 44 : level == 3? 48 : level == 4 ? 53 : 58
                     ,level,"client_side/view/pics/archer.png","client_side/view/pics/archer_attack",
                     3,40,40,5, TargetTypes.AIR_GROUND,2,false,point2D,owner, SpeedTypes.MEDIUM,1.2
-                    ,level == 1 ? 125 : level == 2 ? 127 : level == 3 ? 151 : level == 4 ? 166 : 182,"client_side/view/pics/archer_walk",20,"",0);
+                    ,level == 1 ? 125 : level == 2 ? 127 : level == 3 ? 151 : level == 4 ? 166 : 182,"client_side/view/pics/archer_walk",20,"",0,"client_side/view/pics/archer_shot.png");
         }
         else if (typeParam == CardTypes.BABY_DRAGON)
         {
             return new SoldierCard(isServerSide,typeParam,4,level == 1 ? 100 : level == 2 ? 110 : level == 3? 121 : level == 4 ? 133 : 146
                     ,level,"client_side/view/pics/heli.png","client_side/view/pics/heli_walk",
-                    1,100,100,3, TargetTypes.AIR_GROUND,1,true,point2D,owner, SpeedTypes.FAST,1.8
-                    ,level == 1 ? 800 : level == 2 ? 880 : level == 3 ? 968 : level == 4 ? 1064 : 1168,"client_side/view/pics/heli_walk",1,"",0);
+                    2,100,100,3, TargetTypes.AIR_GROUND,1,true,point2D,owner, SpeedTypes.FAST,1.8
+                    ,level == 1 ? 800 : level == 2 ? 880 : level == 3 ? 968 : level == 4 ? 1064 : 1168,"client_side/view/pics/heli_walk",2,"",0,"client_side/view/pics/archer_shot.png");
         }
         else if (typeParam == CardTypes.WIZARD)
         {
             return new SoldierCard(isServerSide,CardTypes.WIZARD,5,level == 1 ? 130 : level == 2 ? 143 : level == 3? 157 : level == 4 ? 172 : 189
                     ,level,"client_side/view/pics/wizard.png","client_side/view/pics/wizard_shot",
                     1,30,30,5, TargetTypes.AIR_GROUND,1,true,point2D,owner,SpeedTypes.MEDIUM,1.7
-                    ,level == 1 ? 340 : level == 2 ? 374 : level == 3 ? 411 : level == 4 ? 452 : 496,"client_side/view/pics/wizard_walk",1,"",0);
+                    ,level == 1 ? 340 : level == 2 ? 374 : level == 3 ? 411 : level == 4 ? 452 : 496,"client_side/view/pics/wizard_walk",1,"",0,"client_side/view/pics/wizard_shot0.png");
         }
         else if (typeParam == CardTypes.MINI_PEKKA)
         {
             return new SoldierCard(isServerSide,CardTypes.MINI_PEKKA,4,level == 1 ? 325 : level == 2 ? 357 : level == 3? 393 : level == 4 ? 432 : 474
                     ,level,"client_side/view/pics/pekka.png","client_side/view/pics/pekka_attack",
                     7,35,35,0, TargetTypes.GROUND,1,false,point2D,owner, SpeedTypes.FAST,1.8
-                    ,level == 1 ? 600 : level == 2 ? 660 : level == 3 ? 726 : level == 4 ? 798 : 876,"client_side/view/pics/pekka_walk",6,"",0);
+                    ,level == 1 ? 600 : level == 2 ? 660 : level == 3 ? 726 : level == 4 ? 798 : 876,"client_side/view/pics/pekka_walk",6,"",0,null);
         }
         else if (typeParam == CardTypes.GIANT)
         {
             return new SoldierCard(isServerSide,CardTypes.GIANT,5,level == 1 ? 126 : level == 2 ? 138 : level == 3? 152 : level == 4 ? 167 : 183
                     ,level,"client_side/view/pics/giant.png","client_side/view/pics/giant_attack",
                     5,60,50,0, TargetTypes.BUILDINGS,1,false,point2D,owner, SpeedTypes.SLOW,1.5
-                    ,level == 1 ? 2000 : level == 2 ? 2200 : level == 3 ? 2420 : level == 4 ? 2660 : 2920,"client_side/view/pics/giant_walking",4,"",0);
+                    ,level == 1 ? 2000 : level == 2 ? 2200 : level == 3 ? 2420 : level == 4 ? 2660 : 2920,"client_side/view/pics/giant_walking",4,"",0,null);
         }
         else if (typeParam == CardTypes.VALKYRIE)
         {
             return new SoldierCard(isServerSide,typeParam,4,level == 1 ? 120 : level == 2 ? 132 : level == 3? 145 : level == 4 ? 159 : 175
                     ,level,"client_side/view/pics/valkyrie.png","client_side/view/pics/valkyrie_attack",
                     6,40,50,0, TargetTypes.GROUND,1,true,point2D,owner, SpeedTypes.MEDIUM,1.5
-                    ,level == 1 ? 880 : level == 2 ? 968 : level == 3? 1064 : level == 4 ? 1170 : 1284,"client_side/view/pics/valkyrie_walk",8,"client_side/view/pics/valkyrie_die",1);
+                    ,level == 1 ? 880 : level == 2 ? 968 : level == 3? 1064 : level == 4 ? 1170 : 1284,"client_side/view/pics/valkyrie_walk",8,"client_side/view/pics/valkyrie_die",1,null);
         }
         else if (typeParam == CardTypes.RAGE) // attention !! : duration is not added in the card
         {
@@ -201,34 +210,34 @@ public abstract class Troop extends TimerTask{
         {
             return new SpellCard(isServerSide,typeParam,3,level == 1 ? 144 : level == 2 ? 156 : level == 3? 174 : level == 4 ? 189 : 210
                     ,level,"client_side/view/pics/arrow.png","client_side/view/pics/arrow",
-                    1,30,80,4,null,1,false,point2D,owner,SpeedTypes.VERY_FAST // this can be changed later
+                    1,30,80,4,null,4,false,point2D,owner,SpeedTypes.VERY_FAST // this can be changed later
                     ,0,0,0,true , 0);
         }
         else if (typeParam == CardTypes.CANNON) // explosion can be added as dieFrm
         {
             return new BuildingCard(isServerSide,typeParam,6,level == 1 ? 60 : level == 2 ? 66 : level == 3? 72 : level == 4 ? 79 : 87
-                    ,level,"client_side/view/pics/cannon.png","client_side/view/pics/cannon_walk",
+                    ,level,"client_side/view/pics/cannon.png","client_side/view/pics/cannon_full",
                     1,50,50,5.5,TargetTypes.GROUND,1,false,point2D,owner,"",0,
-                    0.8,30,level == 1 ? 380 : level == 2 ? 418 : level == 3? 459 : level == 4 ? 505 : 554);
+                    0.8,30,level == 1 ? 380 : level == 2 ? 418 : level == 3? 459 : level == 4 ? 505 : 554,"client_side/view/pics/cannon_shot0.png");
         }
         else if (typeParam == CardTypes.INFERNO_TOWER)
         {
             return new BuildingCard(isServerSide,typeParam,5,level == 1 ? 400 : level == 2 ? 440 : level == 3? 484 : level == 4 ? 532 : 584
-                    ,level,"client_side/view/pics/inferno.png","client_side/view/pics/inferno_attack",
+                    ,level,"client_side/view/pics/inferno.png","client_side/view/pics/inferno_body",
                     1,45,45,6,TargetTypes.AIR_GROUND,1,false,point2D,owner,"",0,
-                    0.4,40,level == 1 ? 800 : level == 2 ? 880 : level == 3? 968 : level == 4 ? 1064 : 1168);
+                    0.4,40,level == 1 ? 800 : level == 2 ? 880 : level == 3? 968 : level == 4 ? 1064 : 1168,null);
         }
         else if (towerType == TowerTypes.KING_TOWER)
         {
             return new Tower(isServerSide,level == 1 ? 50 : level == 2 ? 53 : level == 3 ? 57 : level == 4 ? 60 : 64 ,
                     level , "client_side/view/pics/kingTowerHead" , 1 , 90 , 90 ,7 ,TargetTypes.GROUND ,
-                    TowerTypes.KING_TOWER , level == 1 ? 2400 : level == 2 ? 2568 : level == 3 ? 2736 : level == 4 ? 2904 : 3096 ,1,point2D,owner);
+                    TowerTypes.KING_TOWER , level == 1 ? 2400 : level == 2 ? 2568 : level == 3 ? 2736 : level == 4 ? 2904 : 3096 ,1,point2D,owner,"client_side/view/pics/king_shot.png");
         }
         else if (towerType == TowerTypes.PRINCESS_TOWER)
         {
             return new Tower(isServerSide,level == 1 ? 50 : level == 2 ? 54 : level == 3 ? 58 : level == 4 ? 62 : 69 ,
                     level , "client_side/view/pics/princessTowerHead" , 1 , 90 , 90 ,7.5 ,TargetTypes.AIR_GROUND ,
-                    TowerTypes.PRINCESS_TOWER , level == 1 ? 1400 : level == 2 ? 1512 : level == 3 ? 1624 : level == 4 ? 1750 : 1890 ,0.8,point2D,owner);
+                    TowerTypes.PRINCESS_TOWER , level == 1 ? 1400 : level == 2 ? 1512 : level == 3 ? 1624 : level == 4 ? 1750 : 1890 ,0.8,point2D,owner,"client_side/view/pics/princess_shot.png");
         }
         else {
             return null;
@@ -287,33 +296,13 @@ public abstract class Troop extends TimerTask{
     public void getBeingHit(int damage) // attention ! deleting from board happens in other methods ...
     {
         this.setHp(damage);
-        if (getHp() == 0) // sending die message to logic or board
+        if (getHp() == 0 && isServerSide) // sending die message to logic or board
         {
+            setState(State.DEAD); // for rendering
             try {
-                inGameInbox.put(new Message(MessageType.CHARACTER_DIED ,getOwner(),getId()));
+                inGameInbox.put(new Message(MessageType.CHARACTER_DIED ,getOwner(),getId())); // must change here!!!!
                 actTimer.cancel();
                 this.setTargetToDoAct(null);
-                if (this instanceof SoldierCard)
-                {
-                    SoldierCard soldierCard = (SoldierCard) this;
-                    try {
-                        soldierCard.getWalkTimer().cancel();
-
-                    }catch (Exception e)
-                    {
-
-                    }
-
-                    soldierCard.setWalkTask(null);
-                    soldierCard.setWalkTimer(null);
-                }
-                else if (this instanceof SpellCard)
-                {
-                    SpellCard spellCard = (SpellCard) this;
-                    spellCard.getWalkTimer().cancel();
-                    spellCard.setWalkTask(null);
-                    spellCard.setWalkTimer(null);
-                }
             }
             catch (InterruptedException e)
             {
@@ -387,6 +376,28 @@ public abstract class Troop extends TimerTask{
         return id;
     }
 
+    public State getState()
+    {
+        return state;
+    }
 
+    public void setState(State state) {
+        this.state = state;
+    }
 
+    public boolean isServerSide() {
+        return isServerSide;
+    }
+
+    public void setRender(Render render) {
+        this.render = render;
+    }
+
+    public Render getRender() {
+        return render;
+    }
+
+    public String getShotPath() {
+        return shotPath;
+    }
 }

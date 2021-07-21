@@ -4,6 +4,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import shared.enums.CardTypes;
 import shared.enums.SpeedTypes;
+import shared.enums.State;
 import shared.enums.TargetTypes;
 import shared.model.Board;
 import shared.model.troops.Troop;
@@ -25,9 +26,9 @@ public class SoldierCard extends Card{
 
     public SoldierCard(boolean isServerSide, CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                        int width , int height , double range , TargetTypes target , int count , boolean areaSplash ,
-                       Point2D coordinates , String owner, SpeedTypes movingSpeed , double hitSpeed , int hp , String walkFrmPath , int walkFrmNum , String dieFrmPath , int dieFrmNum)
+                       Point2D coordinates , String owner, SpeedTypes movingSpeed , double hitSpeed , int hp , String walkFrmPath , int walkFrmNum , String dieFrmPath , int dieFrmNum , String shotPath)
     {
-        super(isServerSide, type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner);
+        super(isServerSide, type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner,shotPath);
         this.movingSpeed = movingSpeed;
         this.hitSpeed = hitSpeed;
         this.hp = hp;
@@ -47,7 +48,6 @@ public class SoldierCard extends Card{
     public void run() { // attack task
         if (getTargetToDoAct() != null)
         {
-            Troop toDo = getTargetToDoAct();
             if(isAreaSplash())
             {
                 ArrayList<Troop> enemies = board.getNearEnemies(this);
@@ -60,17 +60,16 @@ public class SoldierCard extends Card{
             else {
                 this.getTargetToDoAct().getBeingHit(this.getDamage());
             }
+            if (getType() == CardTypes.ARCHER || getType() == CardTypes.BABY_DRAGON || getType() == CardTypes.WIZARD)
+                getRender().addForRender(this,true);
         }
 
     }
 
-    //    public Image getWalkFrm(){
-//
-//    }
-
-//    public Image getDieFrm(){
-//
-//    }
+    public Image getWalkFrm(double time , double duration){
+        int index = (int)((time % (walkFrames.length * duration)) / duration);
+        return walkFrames[index];
+    }
 
 
     /**
@@ -101,15 +100,16 @@ public class SoldierCard extends Card{
      * setter
      * @param direction the new direction(to go)
      */
-    public void setDirection(String direction) {
+    public synchronized void setDirection(String direction) {
         this.direction = direction;
+        notifyAll();
     }
 
     /**
      * getter
      * @return direction of going
      */
-    public String getDirection() {
+    public synchronized String getDirection() {
         return direction;
     }
 
@@ -133,39 +133,33 @@ public class SoldierCard extends Card{
                 {
                     if (yEnemy <= thisY)
                     {
-                        this.direction = "up";
-                        setDirection(direction);
+                        setDirection("up");
                     }
                     else
                     {
-                        this.direction = "down";
-                        setDirection(direction);
+                        setDirection("down");
                     }
                 }
                 else if (thisY == yEnemy)
                 {
                     if (xEnemy > thisX)
                     {
-                        this.direction = "right";
-                        setDirection(direction);
+                        setDirection("right");
                     }
                     else
                     {
-                        this.direction = "left";
-                        setDirection(direction);
+                        setDirection("left");
                     }
                 }
                 else {
                     int slope = (int)((yEnemy - thisY) / (xEnemy - thisX));
                     if (xEnemy > thisX)
                     {
-                        this.direction = slope + "," + "right";
-                        setDirection(direction);
+                        setDirection(slope + "," + "right");
                     }
                     else
                     {
-                        this.direction = slope + "," + "left";
-                        setDirection(direction);
+                        setDirection(slope + "," + "left");
                     }
                 }
             }
@@ -173,11 +167,6 @@ public class SoldierCard extends Card{
                 setDirection(board.getNearestWay(this));
             }
         }
-        if (walkTimer != null)
-            walkTimer.cancel();
-        walkTimer = new Timer();
-        setWalkTask(new CoordinateUpdater(this,direction, board.getCoordinateUpdateQueue()));
-        walkTimer.schedule(walkTask , 0 ,  (int)(1000 / this.getMovingSpeed().getValue()));
 }
 
     /**
@@ -232,12 +221,15 @@ public class SoldierCard extends Card{
             {
                 setTargetToDoAct(nearEnemies.get(0));
                 Timer atcTim = new Timer();
-                atcTim.schedule(this , 0 , (long) (1000 * getHitSpeed()));
                 setActTimer(atcTim);
-                direction = "attack";
+                atcTim.schedule(this , 0 , (long) (1000 * getHitSpeed()));
+                setState(State.ATTACK);
+                direction = "attack"; // redundant
             }
-            else
+            else{
+                setState(State.WALK);
                 decideWhereToGo(board);
+            }
         }
         else if (isDead) // updating state is because of dying some troop
         {
@@ -252,9 +244,13 @@ public class SoldierCard extends Card{
                     setActTimer(new Timer());
                     getActTimer().schedule(this,0,(long) (1000 * getHitSpeed()));
                     direction = "attack";
+                    setState(State.ATTACK);
                 }
                 else
+                {
+                    setState(State.WALK);
                     decideWhereToGo(board);
+                }
             }
         }
         else { // updating is because of changing coordinate of somebody
@@ -263,22 +259,21 @@ public class SoldierCard extends Card{
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
                 if(nearEnemies.size() > 0)
                 {
-                    walkTimer.cancel();
-                    setWalkTask(null);
+//                    walkTimer.cancel();
+//                    setWalkTask(null);
+                    setState(State.ATTACK);
                     direction = "attack";
                     setActTimer(new Timer());
                     getActTimer().schedule(this,0,(long) (1000 * getHitSpeed()));
                     setTargetToDoAct(nearEnemies.get(0));
                 }
                 else
+                {
+                    setState(State.WALK);
                     decideWhereToGo(board);
+                }
             }
         }
-
-
-
-
-
     }
 
     /**s

@@ -8,6 +8,7 @@ import shared.model.Board;
 import shared.model.Message;
 import shared.model.player.Player;
 import shared.model.troops.Troop;
+import shared.model.troops.card.BuildingCard;
 import shared.model.troops.card.Card;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -51,14 +52,16 @@ public class FakeLogic implements Runnable{
             chosen.setId(cardUsedNum);
             board.addTroop(chosen);
             chosen.updateState(board, null, false);
-            render.addForRender(chosen);
+            chosen.setRender(render);
+            render.addForRender(chosen , false);
         } else {
             chosen.setCoordinates(new Point2D(tileX, tileY));
             board.addTroop(chosen);
             chosen.updateState(board, null, false);
             cardUsedNum++;
             chosen.setId(cardUsedNum);
-            render.addForRender(chosen);
+            chosen.setRender(render);
+            render.addForRender(chosen,false);
             for (int i = 0; i < chosen.getCount() - 1; i++) {
                 Card newCard = null;
                 if (board.isValidAddress(chosen, tileX - 1, tileY)) {
@@ -91,7 +94,8 @@ public class FakeLogic implements Runnable{
                     board.addTroop(newCard);
                     newCard.updateState(board, null, false);
                 }
-                render.addForRender(newCard);
+                newCard.setRender(render);
+                render.addForRender(newCard , false);
             }
         }
     }
@@ -110,19 +114,16 @@ public class FakeLogic implements Runnable{
         Card[] card = new Card[1];
         Platform.runLater(() -> {
             card[0] = (Card) Troop.makeTroop(false,cardType,humanPlayer.getLevel(),null,owner); // serverSide is true because it's not javaFX thread
-            System.out.println("here!");
         });
         while (card[0] == null)
         {
             try {
                 Thread.sleep(1000);
-
             }catch (InterruptedException e)
             {
                 e.printStackTrace();
             }
         }
-        System.out.println("type " + card[0].getType());
         return card[0];
     }
 

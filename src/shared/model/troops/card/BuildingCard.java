@@ -4,6 +4,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import shared.enums.CardTypes;
 import shared.enums.SpeedTypes;
+import shared.enums.State;
 import shared.enums.TargetTypes;
 import shared.model.Board;
 import shared.model.troops.Troop;
@@ -19,9 +20,9 @@ public class BuildingCard extends Card {
     private Board board;
 
     public BuildingCard( boolean isServerSide, CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
-                        int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates, String owner, String dieFrmPath , int dieFrmNum , double hitSpeed , int lifeTime , int hp)
+                        int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates, String owner, String dieFrmPath , int dieFrmNum , double hitSpeed , int lifeTime , int hp ,String shotPath)
     {
-        super(isServerSide,type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count , areaSplash ,coordinates , owner);
+        super(isServerSide,type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count , areaSplash ,coordinates , owner,shotPath);
         dieFrames = new Image[dieFrmNum];
         if (!isServerSide)
             for (int i = 0 ; i < dieFrmNum ; i++)
@@ -36,12 +37,14 @@ public class BuildingCard extends Card {
     public void run() { // attack task
         Troop toAttack = getTargetToDoAct();
         if (toAttack != null)
+        {
             toAttack.getBeingHit(getDamage());
+            if (!isServerSide() && getType() == CardTypes.CANNON)
+            {
+                getRender().addForRender(this,true);
+            }
+        }
     }
-
-    //    public Image getDieFrm(){
-//
-//    }
 
 
     /**
@@ -103,9 +106,11 @@ public class BuildingCard extends Card {
             {
                 getActTimer().cancel();
                 setTargetToDoAct(null);
+                setState(State.STOP);
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
                 if (nearEnemies.size() > 0) // still enemy around here to attack
                 {
+                    setState(State.ATTACK);
                     setTargetToDoAct(nearEnemies.get(0));
                     setActTimer(new Timer());
                     getActTimer().schedule(this,0 , (long) (1000 * hitSpeed));
@@ -116,8 +121,10 @@ public class BuildingCard extends Card {
                 if (getTargetToDoAct() == null) // if there is no target , so decide on state changing
                 {
                     ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
+                    setState(State.STOP);
                     if (nearEnemies.size() > 0)
                     {
+                        setState(State.ATTACK);
                         setTargetToDoAct(nearEnemies.get(0));
                         setActTimer(new Timer());
                         getActTimer().schedule(this,0,(long) (1000 * hitSpeed));
@@ -131,6 +138,7 @@ public class BuildingCard extends Card {
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
                 if (nearEnemies.size() > 0)
                 {
+                    setState(State.ATTACK);
                     setActTimer(new Timer());
                     getActTimer().schedule(this,0 ,(long) (1000 * hitSpeed));
                     setTargetToDoAct(nearEnemies.get(0));

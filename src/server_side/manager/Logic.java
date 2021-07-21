@@ -34,7 +34,7 @@ public class Logic implements Runnable {
         this.gameMode = gameMode;
         this.toCheckEvents = toCheckEvents;
         this.board = new Board(gameMode.equals("2v2") ? BoardTypes.FOUR_PLAYERS : BoardTypes.TWO_PLAYERS , true , humanPlayer.getName() , humanPlayer.getLevel() , gameMode);
-        board.addTowers(true,board.getType() , humanPlayer.getName() , inGameInbox);
+        board.addTowers(true,board.getType() , humanPlayer.getName() , inGameInbox , null);
     }
 
     public boolean isFinished(boolean isTimerFinished) throws InterruptedException{

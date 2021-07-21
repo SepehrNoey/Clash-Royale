@@ -26,14 +26,14 @@ public class SpellCard extends Card{
     private double durationForRage;
     private boolean isTimerSet;
     private Point2D destination;
-
+    private String shotPath; // attackFrmPath
 
     public SpellCard(boolean isServerSide, CardTypes type , int cost , int damage , int level , String cardImagePath , String attackFrmPath , int attackFrmNum ,
                      int width , int height , double range , TargetTypes target , int count , boolean areaSplash , Point2D coordinates,
                      String owner, SpeedTypes movingSpeed ,
                      int damageBoost , int speedBoost , int hitSpeedBoost , boolean reducedDmg , double durationForRage)
     {
-        super(isServerSide,type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner);
+        super(isServerSide,type, cost, damage, level, cardImagePath, attackFrmPath, attackFrmNum, width, height, range, target, count, areaSplash , coordinates , owner,null);
         this.movingSpeed = movingSpeed;
         this.damageBoost = damageBoost;
         this.speedBoost = speedBoost;
@@ -150,59 +150,63 @@ public class SpellCard extends Card{
      * @param changedTroop this parameter is not used for spellCards
      * @param isDead this parameter is not used for spellCards
      */
-    public void updateState(Board board , Troop changedTroop , boolean isDead) { // still has problem!!!
-        if (!isTimerSet)
+    public void updateState(Board board , Troop changedTroop , boolean isDead) {
+        if (!isTimerSet) // first time
         {
-            destination = new Point2D(this.getCoordinates().getX() , this.getCoordinates().getY());
+            if (!(this.getType() == CardTypes.RAGE)){
+                // making destination and start point
+                destination = new Point2D(this.getCoordinates().getX() , this.getCoordinates().getY());
+                if (this.getOwner().contains("bot"))
+                    this.setCoordinates(new Point2D(10 , 4)); // startPoints
+                else
+                    this.setCoordinates(new Point2D(10,26)); // startPoint
+            }
             isTimerSet = true;
             this.board = board;
-            setWalkTimer(new Timer());
-            decideWhereToGo();
-            setWalkTask(new CoordinateUpdater(this,direction, board.getCoordinateUpdateQueue()));
-            walkTimer.schedule(walkTask , 0 ,(int)(1000 / getMovingSpeed().getValue()) );
+//            setWalkTimer(new Timer());
+//            decideWhereToGo();
+//            setWalkTask(new CoordinateUpdater(this,direction, board.getCoordinateUpdateQueue()));
+
+//            walkTimer.schedule(walkTask , 0 ,(int)(1000 / getMovingSpeed().getValue()) );
         }
-        else {
-            if ((int)destination.getX() == (int)this.getCoordinates().getX() && (int)destination.getY() == (int)this.getCoordinates().getY())
-            {// destination is reached
-                walkTimer.cancel();
-                setWalkTimer(null);
-                setWalkTask(null);
-                setActTimer(new Timer());
-                getActTimer().schedule(this,0); // should i delete it from any list ???
-            }
-        }
+//        else { // should change here for rage
+//            if ((int)destination.getX() == (int)this.getCoordinates().getX() && (int)destination.getY() == (int)this.getCoordinates().getY())
+//            {// destination is reached
+////                walkTimer.cancel();
+////                setWalkTimer(null);
+////                setWalkTask(null);
+////                setActTimer(new Timer());
+////                getActTimer().schedule(this,0); // should i delete it from any list ???
+//            }
+//        }
     }
 
-    private void decideWhereToGo(){
-        int xEnemy = (int)getCoordinates().getX();
-        int yEnemy = (int)getCoordinates().getY();
-        int thisX = 10;
-        int thisY =26;
-        if (this.getType() == CardTypes.RAGE)
-            direction = "rage"; // just for rage
-        else if (thisX == xEnemy)
-        {
-            if (yEnemy <= thisY)
-                direction = "up";
-            else
-                direction = "down";
-        }
-        else if (thisY == yEnemy)
-        {
-            if (xEnemy > thisX)
-                direction = "right";
-            else
-                direction = "left";
-        }
-        else {
-            int slope = (int)((yEnemy - thisY) / (xEnemy - thisX));
-            if (xEnemy > thisX)
-                direction = slope + "," + "right";
-            else
-                direction = slope + "," + "left";
-        }
-
-    }
+//    private void decideWhereToGo(){
+//        if (this.getType() == CardTypes.RAGE)
+//            direction = "rage"; // just for rage
+//        else if ((int)this.getCoordinates().getX() == (int)destination.getX())
+//        {
+//            if ((int)destination.getY() <= (int)getCoordinates().getY())
+//                direction = "up";
+//            else
+//                direction = "down";
+//        }
+//        else if ((int)getCoordinates().getY() == (int)destination.getY())
+//        {
+//            if ((int)destination.getX() > (int)getCoordinates().getX())
+//                direction = "right";
+//            else
+//                direction = "left";
+//        }
+//        else {
+//            int slope = (int)((destination.getY() - getCoordinates().getY()) / ((int)destination.getX() - (int)getCoordinates().getX()));
+//            if ((int)destination.getX() > (int)getCoordinates().getX())
+//                direction = slope + "," + "right";
+//            else
+//                direction = slope + "," + "left";
+//        }
+//
+//    }
 
     /**
      * setter for hp
@@ -238,4 +242,9 @@ public class SpellCard extends Card{
     public Timer getWalkTimer() {
         return walkTimer;
     }
+
+    public Point2D getDestination() {
+        return destination;
+    }
+
 }

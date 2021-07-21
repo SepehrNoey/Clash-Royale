@@ -1,5 +1,6 @@
 package shared.model;
 
+import client_side.view.render.Render;
 import javafx.geometry.Point2D;
 import shared.enums.BoardThings;
 import shared.enums.BoardTypes;
@@ -12,7 +13,6 @@ import shared.model.troops.card.SoldierCard;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedTransferQueue;
 
 public class Board implements Runnable {
     private BoardThings[][] board;
@@ -25,7 +25,7 @@ public class Board implements Runnable {
     private String botName;
     private int humanLevel;
     private ArrayBlockingQueue<Card> coordinateUpdateQueue;
-    private ArrayBlockingQueue<Card> renderQueue;
+    private ArrayBlockingQueue<Troop> renderQueue;
 
     public Board(BoardTypes type , boolean isServerSide , String humanPlayer , int humanLevel , String botName){
         this.type = type;
@@ -172,9 +172,9 @@ public class Board implements Runnable {
      * @param playerName who is these towers for
      * @param inGameInbox is used for sending data to gameLoop
      */
-    public void addTowers(boolean isServerSide,BoardTypes boardType , String playerName , ArrayBlockingQueue<Message> inGameInbox)
+    public void addTowers(boolean isServerSide, BoardTypes boardType , String playerName , ArrayBlockingQueue<Message> inGameInbox , Render render) // use render just in client side
     {
-        if (boardType == BoardTypes.TWO_PLAYERS)  // attention !! point2D is addressed by index  0 to MAX !!! - like Board
+        if (boardType == BoardTypes.TWO_PLAYERS)
         {
             // player towers
             Troop troop = null;
@@ -182,6 +182,7 @@ public class Board implements Runnable {
                     new Point2D(10,26) , playerName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
+            troop.setRender(render);
 
             this.addTroop(troop);
 
@@ -189,12 +190,14 @@ public class Board implements Runnable {
                     new Point2D(4,25) , playerName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
+            troop.setRender(render);
             this.addTroop(troop);
 
             troop = Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
                     new Point2D(16,25) , playerName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
+            troop.setRender(render);
             this.addTroop(troop);
 
             // bot towers
@@ -202,18 +205,21 @@ public class Board implements Runnable {
                     new Point2D(10,3) , botName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
+            troop.setRender(render);
             this.addTroop(troop); // attention : !! game mode is set for bot name
 
             troop = Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
                     new Point2D(4,5) , botName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
+            troop.setRender(render);
             this.addTroop(troop);
 
             troop = Troop.makeTroop(isServerSide,TowerTypes.PRINCESS_TOWER.toString() , humanLevel ,
                     new Point2D(16,5) , botName);
             troop.setInGameInbox(inGameInbox);
             troop.setId();
+            troop.setRender(render);
             this.addTroop(troop);
         }
         else {
@@ -271,15 +277,15 @@ public class Board implements Runnable {
         for (Troop troop:addedTroops)
         {
             troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
-            try {
-                if (!isServerSide){
-                    renderQueue.put(changedCard);
-                    System.out.println("card is picked . notifying others..");
-                }
-            }catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+//            try {
+//                if (!isServerSide){
+//                    renderQueue.put(changedCard);
+//                    System.out.println("card is picked . notifying others..");
+//                }
+//            }catch (InterruptedException e)
+//            {
+//                e.printStackTrace();
+//            }
         }
 
     }
@@ -295,9 +301,6 @@ public class Board implements Runnable {
         }
         return null;
     }
-
-
-
 
     public String getNearestWay(Card card){ // this method gives second destination (when character wants to go to road)
         if (card.getOwner().contains("bot") && (int)card.getCoordinates().getY() == 25)
@@ -322,13 +325,13 @@ public class Board implements Runnable {
             else
                 return "up";
         }
-        else if ((int)card.getCoordinates().getX() < 3)
+        else if ((int)card.getCoordinates().getX() < 4)
             return "right";
-        else if ((int)card.getCoordinates().getX() >= 3 && (int)card.getCoordinates().getX() <= 10)
+        else if ((int)card.getCoordinates().getX() >= 5 && (int)card.getCoordinates().getX() <= 10)
             return "left";
-        else if ((int)card.getCoordinates().getX() >= 10 && (int)card.getCoordinates().getX() <= 14)
+        else if ((int)card.getCoordinates().getX() >= 10 && (int)card.getCoordinates().getX() <= 16)
             return "right";
-        else if ((int)card.getCoordinates().getX() >= 18)
+        else if ((int)card.getCoordinates().getX() >= 16)
             return "left";
         return null;
     }
@@ -396,7 +399,7 @@ public class Board implements Runnable {
     }
 
 
-    public void setRenderQueue(ArrayBlockingQueue<Card> renderQueue) {
+    public void setRenderQueue(ArrayBlockingQueue<Troop> renderQueue) {
         this.renderQueue = renderQueue;
     }
 }

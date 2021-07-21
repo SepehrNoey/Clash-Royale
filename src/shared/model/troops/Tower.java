@@ -21,9 +21,9 @@ public class Tower extends Troop{
 
     public Tower(boolean isServerSide, int damage, int level, String attackFrmPath, int attackFrmNum, int width,
                  int height, double range, TargetTypes target, TowerTypes type, int hp,
-                 double hitSpeed, Point2D coordinates , String owner)
+                 double hitSpeed, Point2D coordinates , String owner,String shotPath)
     {
-        super(isServerSide, damage, level, attackFrmPath, attackFrmNum, width, height, range, target ,coordinates , owner);
+        super(isServerSide, damage, level, attackFrmPath, attackFrmNum, width, height, range, target ,coordinates , owner,shotPath);
         this.type = type;
         this.hp = hp;
         this.hitSpeed = hitSpeed;
@@ -32,10 +32,11 @@ public class Tower extends Troop{
     @Override
     public void run() { // attack task
         Troop toAttack = getTargetToDoAct();
-        if (toAttack != null) // target exists
+        if (toAttack != null) { // target exists
             toAttack.getBeingHit(getDamage());
+            getRender().addForRender(this,true);
+        }
     }
-
     /**
      * getter
      * @return type of tower
