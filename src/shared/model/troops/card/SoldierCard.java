@@ -197,7 +197,7 @@ public class SoldierCard extends Card{
             else // it's not enough close to it
                 return false;
         }
-        else if (Math.pow(troop.getCoordinates().getX() - getCoordinates().getX() , 2) + Math.pow(troop.getCoordinates().getY() - getCoordinates().getY() , 2) <= getRange())
+        else if (Math.pow(troop.getCoordinates().getX() - getCoordinates().getX() , 2) + Math.pow(troop.getCoordinates().getY() - getCoordinates().getY() , 2) <= getRange() && !(troop instanceof SpellCard))
         { // range cards
             return true;
         }

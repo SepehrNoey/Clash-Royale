@@ -534,21 +534,25 @@ public class MenuScene {
             Group group = new Group();
             Label[] labels = new Label[splitHistory.length/2];
             StringBuilder sb = new StringBuilder();
+            int j = -1;
             for(int i=0;i< splitHistory.length;i++)
             {
+                j++;
                 sb.append("opponent  :  ");
                 sb.append(splitHistory[i]);
                 sb.append("    winner  :  ");
                 sb.append(splitHistory[i+1]);
-                labels[i] = new Label(sb.toString());
-                group.getChildren().add(labels[i]);
-                labels[i].setFont(new Font(14));
-                labels[i].setTranslateX(50);
-                labels[i].setTranslateY((++i)*50);
+                labels[j] = new Label(sb.toString());
+                group.getChildren().add(labels[j]);
+                labels[j].setFont(new Font(14));
+                labels[j].setTranslateX(50);
+                labels[j].setTranslateY((i++)*20);
                 sb.setLength(0);
             }
             stage.setScene(new Scene(group,400,200,Color.YELLOW));
             stage.setTitle("Battle Histories");
+            stage.setHeight(900);
+            stage.setWidth(630);
             stage.show();
         });
 

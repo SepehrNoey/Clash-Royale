@@ -86,7 +86,7 @@ public class Logic implements Runnable {
         }
         try {
             System.out.println("in winner update going to send game result...");
-            inGameInbox.put(new Message(MessageType.GAME_RESULT, "Server",botPlayer.getName() + "," + humanPlayer.getLevel() + "," + humanPlayer.getXp()));
+            inGameInbox.put(new Message(MessageType.GAME_RESULT, "Server",winner));
         }catch (InterruptedException e)
         {
             e.printStackTrace();

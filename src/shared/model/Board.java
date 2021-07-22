@@ -10,6 +10,7 @@ import shared.model.troops.Tower;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
 import shared.model.troops.card.SoldierCard;
+import shared.model.troops.card.SpellCard;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -293,7 +294,7 @@ public class Board implements Runnable {
         for (Troop troop:addedTroops)  // checking a circle with radius sqrt(72)
         {
             if (Math.pow(x - troop.getCoordinates().getX() , 2) + Math.pow(y - troop.getCoordinates().getY() , 2) <= 72
-        && !(troop instanceof Tower ) && !card.getOwner().equals(troop.getOwner()))
+        && !(troop instanceof Tower ) && !card.getOwner().equals(troop.getOwner()) && !(troop instanceof SpellCard))
             {
                 return (Card) troop;
             }

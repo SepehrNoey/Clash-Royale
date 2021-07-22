@@ -41,11 +41,12 @@ public class Render{
     public void gameFinishedMsg(Message msg) // on javaFX thread
     {
         Label label = new Label();
-        label.setText("Game Over");
         label.setFont(new Font(25));
         label.setPrefWidth(300);
         label.setTranslateX(165);
         label.setTranslateY(440);
+        String text = "Game Over\nWinner: " + msg.getContent();
+        label.setText(text);
         controller.getPane().getChildren().add(label);
     }
 
