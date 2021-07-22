@@ -2,10 +2,7 @@ package shared.model;
 
 import client_side.view.render.Render;
 import javafx.geometry.Point2D;
-import shared.enums.BoardThings;
-import shared.enums.BoardTypes;
-import shared.enums.CardTypes;
-import shared.enums.TowerTypes;
+import shared.enums.*;
 import shared.model.troops.Tower;
 import shared.model.troops.Troop;
 import shared.model.troops.card.Card;
@@ -13,6 +10,7 @@ import shared.model.troops.card.SoldierCard;
 import shared.model.troops.card.SpellCard;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Board implements Runnable {
@@ -274,9 +272,19 @@ public class Board implements Runnable {
     }
 
     public void notifyAllTroops(Card changedCard){ // the card which its coordinates are updated
-        for (Troop troop:addedTroops)
-        {
-            troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
+        synchronized (addedTroops){
+            Iterator<Troop> iterator = addedTroops.iterator();
+            while (iterator.hasNext())
+            {
+                Troop troop = iterator.next();
+                troop.updateState(this,changedCard,false);
+            }
+        }
+
+
+//        for (Troop troop:addedTroops)
+//        {
+//            troop.updateState(this,changedCard,false); // isDead messages will be sent to troops from some other method
 //            try {
 //                if (!isServerSide){
 //                    renderQueue.put(changedCard);
@@ -286,7 +294,7 @@ public class Board implements Runnable {
 //            {
 //                e.printStackTrace();
 //            }
-        }
+//        }
 
     }
 
@@ -296,7 +304,11 @@ public class Board implements Runnable {
             if (Math.pow(x - troop.getCoordinates().getX() , 2) + Math.pow(y - troop.getCoordinates().getY() , 2) <= 72
         && !(troop instanceof Tower ) && !card.getOwner().equals(troop.getOwner()) && !(troop instanceof SpellCard))
             {
-                return (Card) troop;
+                if (card.getTarget() == TargetTypes.GROUND && troop instanceof SoldierCard && ((SoldierCard) troop).getType() != CardTypes.BABY_DRAGON)
+                    return (Card) troop;
+                else if (card.getTarget() == TargetTypes.AIR_GROUND)
+                    return (Card) troop;
+                else return null;
             }
         }
         return null;
@@ -370,19 +382,25 @@ public class Board implements Runnable {
     }
 
     public void destroy(Troop destroyed){
-        addedTroops.remove(destroyed);
-        if (destroyed.getId().contains("bot") && destroyed.getId().contains("left"))
-            isLeftUpAreaAllowed = true;
-        else if (destroyed.getId().contains("bot") && destroyed.getId().contains("right"))
-            isRightUpAreaAllowed = true;
+        synchronized (addedTroops)
+        {
+            addedTroops.remove(destroyed);
+            if (destroyed.getId().contains("bot") && destroyed.getId().contains("left"))
+                isLeftUpAreaAllowed = true;
+            else if (destroyed.getId().contains("bot") && destroyed.getId().contains("right"))
+                isRightUpAreaAllowed = true;
+        }
     }
 
     public ArrayList<Tower> getOfTowers(String owner)
     {
-        ArrayList<Tower> towers = new ArrayList<>();
-        for (Troop troop: addedTroops)
-            if (troop.getOwner().equals(owner) && troop instanceof Tower)
-                towers.add((Tower)troop);
-        return towers;
+        synchronized (addedTroops)
+        {
+            ArrayList<Tower> towers = new ArrayList<>();
+            for (Troop troop: addedTroops)
+                if (troop.getOwner().equals(owner) && troop instanceof Tower)
+                    towers.add((Tower)troop);
+            return towers;
+        }
     }
 }

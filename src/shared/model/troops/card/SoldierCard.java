@@ -221,6 +221,7 @@ public class SoldierCard extends Card{
             if (nearEnemies.size() > 0)
             {
                 setTargetToDoAct(nearEnemies.get(0));
+                setExec(Executors.newScheduledThreadPool(1));
                 getExec().scheduleAtFixedRate(this , 0 , (long) (1000 * getHitSpeed()) , TimeUnit.MILLISECONDS);
                 setState(State.ATTACK);
                 direction = "attack"; // redundant
@@ -235,12 +236,12 @@ public class SoldierCard extends Card{
             if (getTargetToDoAct() != null && getTargetToDoAct().getId().equals(changedTroop.getId()))
             {
                 getExec().shutdownNow();
-                setExec(Executors.newScheduledThreadPool(1));
                 setTargetToDoAct(null);
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
                 if (nearEnemies.size() > 0) // still enemy around here to attack
                 {
                     setTargetToDoAct(nearEnemies.get(0));
+                    setExec(Executors.newScheduledThreadPool(1));
                     getExec().scheduleAtFixedRate(this,0,(long) (1000 * getHitSpeed()),TimeUnit.MILLISECONDS);
                     direction = "attack";
                     setState(State.ATTACK);
@@ -262,7 +263,9 @@ public class SoldierCard extends Card{
 //                    setWalkTask(null);
                     setState(State.ATTACK);
                     direction = "attack";
+                    setExec(Executors.newScheduledThreadPool(1));
                     getExec().scheduleAtFixedRate(this,0,(long) (1000 * getHitSpeed()),TimeUnit.MILLISECONDS);
+
                     setTargetToDoAct(nearEnemies.get(0));
                 }
                 else

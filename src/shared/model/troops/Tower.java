@@ -97,12 +97,12 @@ public class Tower extends Troop{
             if (getTargetToDoAct() != null && changedTroop.getId().equals(getTargetToDoAct().getId()))
             {
                 getExec().shutdownNow();
-                setExec(Executors.newScheduledThreadPool(1));
                 setTargetToDoAct(null);
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
                 if (nearEnemies.size() > 0) // still enemy around here to attack
                 {
                     setTargetToDoAct(nearEnemies.get(0));
+                    setExec(Executors.newScheduledThreadPool(1));
                     getExec().scheduleAtFixedRate(this,0 , (long) (1000 * hitSpeed), TimeUnit.MILLISECONDS);
                     // no direction for Building cards - state can be recognized by targetToDoAct
                 }
@@ -115,6 +115,7 @@ public class Tower extends Troop{
                 if (nearEnemies.size() > 0)
                 {
                     setTargetToDoAct(nearEnemies.get(0));
+                    setExec(Executors.newScheduledThreadPool(1));
                     getExec().scheduleAtFixedRate(this,0,(long) (1000 * hitSpeed),TimeUnit.MILLISECONDS);
                 }
             }

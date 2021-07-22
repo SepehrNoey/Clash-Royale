@@ -105,7 +105,6 @@ public class BuildingCard extends Card {
             if (getTargetToDoAct() != null && changedTroop.getId().equals(getTargetToDoAct().getId()))
             {
                 getExec().shutdownNow();
-                setExec(Executors.newScheduledThreadPool(1));
                 setTargetToDoAct(null);
                 setState(State.STOP);
                 ArrayList<Troop> nearEnemies = board.getNearEnemies(this);
@@ -113,6 +112,7 @@ public class BuildingCard extends Card {
                 {
                     setState(State.ATTACK);
                     setTargetToDoAct(nearEnemies.get(0));
+                    setExec(Executors.newScheduledThreadPool(1));
                     getExec().scheduleAtFixedRate(this,0 , (long) (1000 * hitSpeed), TimeUnit.MILLISECONDS);
                     // no direction for Building cards - state can be recognized by targetToDoAct
                 }
@@ -126,6 +126,7 @@ public class BuildingCard extends Card {
                     {
                         setState(State.ATTACK);
                         setTargetToDoAct(nearEnemies.get(0));
+                        setExec(Executors.newScheduledThreadPool(1));
                         getExec().scheduleAtFixedRate(this,0,(long) (1000 * hitSpeed),TimeUnit.MILLISECONDS);
                     }
                 }
@@ -138,6 +139,7 @@ public class BuildingCard extends Card {
                 if (nearEnemies.size() > 0)
                 {
                     setState(State.ATTACK);
+                    setExec(Executors.newScheduledThreadPool(1));
                     getExec().scheduleAtFixedRate(this,0 ,(long) (1000 * hitSpeed),TimeUnit.MILLISECONDS);
                     setTargetToDoAct(nearEnemies.get(0));
                 }
